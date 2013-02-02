@@ -1,0 +1,28 @@
+#!/bin/bash
+#------------------------------
+# A script for starting a download with rtorrent
+# Configuration:
+#------------------------------
+TORRENT_WATCH_DIR="$HOME/Downloads/Torrents/downloading"
+TORRENT_ARCHIVE_DIR="$HOME/Downloads/Torrents/archive"
+DATE=`date +%Y-%m-%d`
+FILE="$1"
+#------------------------------
+
+# Check to see if an archive folder exists
+
+if [[ ! -d "$TORRENT_ARCHIVE_DIR/$DATE" ]]; then
+    mkdir -p "$TORRENT_ARCHIVE_DIR/$DATE"
+fi
+
+# Download torrent with rtorrent
+
+if [[ ! -f "$TORRENT_WATCH_DIR/$FILE" ]]; then
+    cp "$FILE" "$TORRENT_WATCH_DIR" > /dev/null 2>&1 || exit 1
+    mv "$FILE" "$TORRENT_ARCHIVE_DIR/$DATE" > /dev/null 2>&1 || exit 1
+    notify-send "Torrent `basename "$FILE"` added for downloading!" > /dev/null 2>&1
+else
+    notify-send "Torrent `basename "$FILE"` already being downloaded!" > /dev/null 2>&1
+fi
+
+exit 0

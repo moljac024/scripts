@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if mount | grep "/mnt/iso/default"; then
+    echo "Already mounted!"
+    exit 1
+fi
+
+if [[ "$#" == "2" ]]; then
+    sudo mount -o ro,loop -t iso9660 $1 $2
+    notify-send "$1 mounted at $2"
+elif [[ "$#" == 1 ]]; then
+    sudo mount -o ro,loop -t iso9660 "$@" /mnt/iso/default
+    notify-send "$1 mounted at /mnt/iso/default"
+else
+    echo "Usage: mount-iso [iso_file] [directory(optional)]"
+fi

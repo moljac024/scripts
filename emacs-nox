@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Call emacs in console mode
+#emacs -nw $@
+
+if ! emacsclient -t $@ > /dev/null; then
+    emacs -nw $@
+fi

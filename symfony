@@ -1,0 +1,96 @@
+#!/bin/bash
+# Configuration:
+DEFAULT_DIRECTORY=./Symfony
+DEFAULT_VERSION=2.1.3
+GIT_IGNORE="/web/bundles/
+/app/bootstrap*
+/app/cache/*
+/app/logs/*
+/vendor/
+/app/config/parameters.yml"
+#--------------
+
+function find_root_dir()
+{
+    while [[ ! (-f ./app/AppKernel.php && -f ./app/console && -d ./vendor/symfony)  ]]; do
+        cd ..
+        if [[ $PWD == "/" ]]; then
+            echo "error: no symfony project found"
+            exit
+        fi
+    done
+}
+
+function new_project()
+{
+    if [[ "$#" -lt 2 ]]
+    then
+        DIRECTORY=$DEFAULT_DIRECTORY
+    else
+        DIRECTORY="$2"
+    fi
+
+    if [[ "$#" -lt 3 ]]
+    then
+        VERSION=$DEFAULT_VERSION
+    else
+        VERSION=$3
+    fi
+
+    if [[ ! -d "$DIRECTORY" ]]
+    then
+        php-composer create-project symfony/framework-standard-edition "$DIRECTORY" $VERSION
+    else
+        echo "error: directory $DIRECTORY already exists"
+        exit 1
+    fi
+
+    cd "$DIRECTORY"
+    echo -n "Setting permissions for app/cache and app/logs directories..."
+
+    sudo setfacl -R -m u:www-data:rwx -m u:`whoami`:rwx app/cache app/logs > /dev/null &&\
+    sudo setfacl -dR -m u:www-data:rwx -m u:`whoami`:rwx app/cache app/logs >/dev/null
+
+    if [[ $? != 1 ]]; then
+        echo "done!"
+    else
+        echo "error!"
+    fi
+
+    # echo -n "Removing git subdirectories, so your hard drive is spared..."
+    # rm -rf `find ./ -type d -name .git` && echo "done!"
+
+    echo -n "Adding .gitignore file to root of project..."
+    echo $GIT_IGNORE > ./.gitignore && echo "done!"
+}
+
+function set_permissions() {
+    which setfacl &> /dev/null
+    if [[ "$?" != "0" ]]; then
+    echo "error: setfacl not found"
+    return
+    fi
+
+    sudo setfacl -R -m u:www-data:rwx -m u:`whoami`:rwx app/cache app/logs web/ &&\
+    sudo setfacl -dR -m u:www-data:rwx -m u:`whoami`:rwx app/cache app/logs web/
+}
+
+if [[ $1 == "new" ]]; then
+    new_project
+    exit
+fi
+
+if [[ $1 == "permissions" || $1 == "set-permissions" || $1 == "perm" ]]; then
+    find_root_dir
+    set_permissions
+    exit
+fi
+
+if [[ $1 == "update-doctrine" ]]; then
+    find_root_dir
+    php app/console doctrine:schema:update --force
+    exit
+fi
+
+find_root_dir
+php app/console $@

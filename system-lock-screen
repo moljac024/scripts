@@ -1,0 +1,37 @@
+#!/bin/bash
+#------------------------------
+# A screen locking script, by moljac024
+#------------------------------
+# Configuration:
+# What to use as screensaver/locker, slock, xlockmore, xscreensaver or gnome-screensaver
+#SCREEN_LOCKER="slock"
+SCREEN_LOCKER="xscreensaver"
+#SCREEN_LOCKER="gnome-screensaver"
+#------------------------------
+
+
+case $SCREEN_LOCKER in
+    "slock")
+        slock
+        ;;
+    "xlockmore")
+        xlock -mode matrix
+        ;;
+    "xscreensaver")
+        if ps -au$UID | grep -v grep | grep xscreensaver > /dev/null; then
+            xscreensaver-command -lock
+        else
+            xscreensaver -no-splash &
+            sleep 0.5 && xscreensaver-command -lock
+        fi
+        ;;
+    "gnome-screensaver")
+        if ! gnome-screensaver-command -l; then
+            gnome-screensaver &
+            sleep 1 && gnome-screensaver-command -l
+        fi
+        ;;
+    *)
+        zenity --error --title="Error!" --text="Error! Unknown screensaver/locker back-end!"
+        ;;
+esac

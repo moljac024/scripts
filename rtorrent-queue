@@ -1,0 +1,183 @@
+#!/bin/sh
+#
+#  dl_queue.sh
+#  
+#  Copyright 2008 Jason Wu <jason.hy.wu@gmail.com>
+#  2008/06/26
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#  
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+#  Description:
+#  This script checks the queue directory and active concurrent download of
+#  rtorrent. The concept here is to to move torrents from the queuing
+#  directory to the watch directory, so that the total number of concurrent
+#  downloads is lower or equal to the specified value.
+#  
+#  The user no longer manage multiple directories for rtorrent download and
+#  move the completed tasks from one directory to another. User only need to
+#  manage the queue directory and the base directory in this script.
+#
+#  eg. when /directory_to/queue/TV/lost and lost_xxx.torrent are created/added.
+#  The script will create a "/directory_to/watch/TV/lost" directory under
+#  watch directory and copy the torrent file to it. Also create the "lost"
+#  directory under base directory "TV" (this points to where the location of
+#  the shared folder). Thus, rtorrent will store the data to
+#  /directory_to/shared_folder/TV/lost/lost_xxx.avi
+#
+#  Features:
+#  * Limit the number of concurrent active downloads in rtorrent
+#  * Create a new watch.directory scheduler as new folder+torrent in queue
+#    directory found and set its destination directory in rtorrent.rc
+#  * Create destination and watch sub folder as appropriated folder+torrent
+#    are found in queue directory
+#  
+
+# Directory where user place their torrents
+queue_dir="/mnt/data/Svastara/Torrents/queue"
+
+# Directory where rtorrent is watching
+watch_dir="/mnt/data/Svastara/Torrents/watch"
+
+# session folder of your rtorrent
+session_dir="/mnt/data/Svastara/Torrents/.rtorrent-session"
+
+# Directory for unsupported file or folder
+unknown_dir="/mnt/data/Svastara"
+
+# log file for this script
+logfile="/mnt/data/Svastara/Torrents/queue/queue.log"
+
+# file keep on track of the scheduler id for rtorrent
+id_file="/volume1/Torrents/.rtconf/queueID"
+
+# where the configuration file is
+rtconf="/home/bojan/.rtorrent.rc"
+
+# directory where the data will be stored to.
+movie_dir="/mnt/data/Svastara"
+tv_dir="/mnt/data/Svastara"
+other_dir="/mnt/data/Svastara"
+
+# number of active download
+# usually rtorrent.dht_cache, rtorrent.lock are also in the session folder.
+max_active_dl=1;
+
+
+while true;
+do
+    no_queue_bt=`find $queue_dir/. -type f | wc -l | awk '{print $1}'`;
+    no_watch_bt=`find $watch_dir/. -type f | wc -l | awk '{print $1}'`;
+    
+   # check if there is torrent for download
+    if [ $no_queue_bt -ge 1 ]; then
+      # make sure active download session is less than maximum download
+	if [ $no_watch_bt -le $max_active_dl ]; then
+            loop=$(($max_active_dl-$no_watch_bt))
+            
+            if [ $no_queue_bt -lt $loop ]; then
+		loop=$no_queue_bt;
+            fi
+            
+            echo "" >> $logfile
+            date >> $logfile
+
+         # insert
+            i=0;
+            until [ $i -eq $loop ]
+            do
+
+		src_bt=`find $queue_dir/. -type f |sort | head -1 | sed 's/\ /\\ /g'`;
+		file_type=${src_bt##*.}
+		
+		
+		if [ $file_type = 'torrent' ]; then
+		    dest_bt="${watch_dir}${src_bt#*/queue/.}"
+		    dest_dir=$(dirname $dest_bt)
+		    
+               # get the base directory
+		    cat=${dest_dir#*/watch/*}
+		    cat=${cat%%/*}
+		    
+               # if you have more or less base directories, edit the
+               # following if-statement
+		    if [ $cat = 'Moive' ]; then
+			dl_dir=$movie_dir
+		    elif [ $cat = 'Games' ]; then
+			dl_dir=$other_dir
+		    elif [ $cat = 'Music' ]; then
+			dl_dir=$other_dir
+		    elif [ $cat = 'Tools' ]; then
+			dl_dir=$other_dir
+		    elif [ $cat =  'TV' ]; then
+			dl_dir=$tv_dir
+		    else
+			dl_dir="unknown"
+		    fi
+		    
+		    if ! [ $dl_dir = unknown ]; then   
+                  # create dir under watch folder
+			if ! [ -e $dest_dir ]; then
+			    echo "Creating dir $dest_dir"  >> $logfile
+			    mkdir -p $dest_dir
+			    su -c "chown guest -R $dest_dir"
+			    su -c "chgrp users -R $dest_dir"
+			    su -c "chmod 775 -R $dest_dir"
+			    dl_dir=${dl_dir}${dest_dir#*/watch/}
+			    
+			    did=`cat $id_file | awk -F: '{print($1)}' | head -1`
+                     # create download destination folder
+			    if ! [ -e ${dl_dir} ]; then
+                        # add a schedule watch folder in rtorrent.rc
+				
+                        # specify the destination at startup
+				echo "schedule = watch_directory_$did,5,60,\"load_start=$dest_dir/*.torrent,d.set_directory=${dl_dir}${dest_dir#*/watch/}/\"" >> $rtconf
+                        # specify the final destination and move the data when torrent is completed. The following command line must add in rtorrent.rc file
+                        # on_finished = move_complete,"execute=mv,$d.get_base_path=,$d.get_custom1="
+                        #echo "schedule = watch_directory_$did,5,60,\"load_start=$dest_dir/*.torrent,d.set_custom1=${dl_dir}/\"" >> $rtconf
+                        # create destination for rtorrent
+				mkdir -p ${dl_dir}
+				su -c "chown guest -R ${dl_dir}"
+				su -c "chgrp users -R ${dl_dir}"
+				su -c "chmod 775 -R ${dl_dir}"
+				echo "Creating destination dir ${dl_dir} for rtorrent scheduler" >> $logfile
+				did=$(( $did + 1 ));
+				echo "$did" > $id_file
+				
+			    fi
+			fi
+			echo "move $dest_bt" >> $logfile
+			
+			if cp -fr $src_bt $dest_bt ; then
+			    rm -fr $src_bt
+			else
+			    echo "unstable to copy file $src_bt"  >> $logfile
+			fi
+		    else
+			echo "ERROR!!! unsupported dir "$cat" found, "
+			echo "$src_bt move to unknown folder" >> $logfile
+			mv $src_bt $unknown_dir
+		    fi
+		    i=$(( $i + 1 ));
+		else
+		    echo "unsupported file $src_bt" >> $logfile
+		    mv $src_bt $unknown_dir
+               #exit
+		fi
+            done
+	fi
+    fi
+    sleep 360 # sleep for 360s
+done

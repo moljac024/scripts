@@ -1,0 +1,39 @@
+#!/bin/bash
+
+#currentSong=`mpc current`
+actionList="\
+Play/Pause
+Stop
+Next
+Previous
+Toggle Repeat
+Toggle Random"
+
+#selected=`echo -e "Play/Pause\nStop\nNext\nPrevious\nToggle Repeat\nToggle Random" | dmenu -p "Music:"`
+selected=`echo "$actionList" | dmenu -i -p "Music:"`
+case $selected in
+    "Play/Pause")
+        mpc toggle
+        ;;
+    "Stop")
+        mpc stop
+        ;;
+    "Next")
+        mpc next
+        ;;
+    "Previous")
+        mpc prev
+        ;;
+    "Toggle Repeat")
+        mpc repeat
+        ;;
+    "Toggle Random")
+        mpc random
+        ;;
+    *)
+        echo "Uknown action!"
+        exit 1
+        ;;
+esac
+
+exit 0

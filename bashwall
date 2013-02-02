@@ -1,0 +1,678 @@
+#!/bin/bash
+#------------------------------
+# BashWall, a wallpaper utility, by moljac024
+#------------------------------
+# Configuration:
+
+# Wallpaper directories
+wpDirRand="$HOME/Pictures/Wallpapers"
+wpDirSeq="$HOME/Pictures/Wallpapers/Sequence"
+
+# Folders to be skipped, you can put as many as you like
+#wpSkip=("Dir1/" "Dir2/")
+wpSkip=("Tiles/")
+
+# How to handle pictures of a lower resolution than the screen (center, scale or zoom)
+#lowerRes="center"
+lowerRes="scale"
+# lowerRes="zoom"
+
+# Screen resolution
+resWidth=1280
+resHeight=800
+
+# What to use as wallpaper setting back-end (possible values: auto, feh, nitrogen, xfce, gnome)
+#wpCommand="auto"
+# wpCommand="feh"
+wpCommand="nitrogen"
+#wpCommand="xfce"
+#wpCommand="gnome"
+
+# What command to prefer if no DE detected (possible values: feh, nitrogen)
+preferCommand="feh"
+#preferCommand="nitrogen"
+
+# Wheter to always use desktop auto settings
+wpAlwaysAuto="yes"
+
+# Wheter to refresh the screen after setting the wallpaper or not
+# (useful for buggy applications and if you're running a compositing wm)
+#refreshX="yes"
+refreshX="no"
+
+# Wallpaper lists paths
+wpListRand=$HOME/.bashwall-list-rand
+wpListSeq=$HOME/.bashwall-list-seq
+
+# Number of non existant files in list to tolerate before forcing update of list
+badMax=1
+
+# End of configuration
+#-------------------------------------------------------------------------------------
+
+# Command for tiling the wallpaper
+cmdTileFeh="feh --bg-tile"
+cmdTileNitrogen="nitrogen --set-tiled --save"
+cmdTileXfce="xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor$monitor/image-path -s"
+cmdTileGnome="gconftool-2 -t str --set /desktop/gnome/background/picture_options "wallpaper" -t str --set /desktop/gnome/background/picture_filename"
+
+# Command for scaling the wallpaper
+cmdScaleFeh="feh --bg-scale"
+cmdScaleNitrogen="nitrogen --set-scaled --save"
+cmdScaleXfce="xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor$monitor/image-path -s"
+#cmdScaleGnome="gconftool-2 -t str --set /desktop/gnome/background/picture_options "scaled" -t str --set /desktop/gnome/background/picture_filename"
+cmdScaleGnome="gconftool-2 -t str --set /desktop/gnome/background/picture_options "zoom" -t str --set /desktop/gnome/background/picture_filename"
+
+# Command for zooming the wallpaper
+cmdZoomFeh="feh --bg-fill"
+cmdZoomNitrogen="nitrogen --set-zoom"
+cmdZoomGnome="gconftool-2 -t str --set /desktop/gnome/background/picture_options "zoom" -t str --set /desktop/gnome/background/picture_filename"
+cmdZoomXfce="xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor$monitor/image-path -s"
+
+# Command for centering the wallpaper
+cmdCenterFeh="feh --bg-center"
+cmdCenterNitrogen="nitrogen --set-centered --save"
+cmdCenterXfce="xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor$monitor/image-path -s"
+cmdAutoXfce="xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor$monitor/image-path -s"
+#cmdCenterGnome="gconftool-2 -t str --set /desktop/gnome/background/picture_options "centered" -t str --set /desktop/gnome/background/picture_filename"
+cmdCenterGnome="gconftool-2 -t str --set /desktop/gnome/background/picture_options "zoom" -t str --set /desktop/gnome/background/picture_filename"
+
+monitor=1
+
+detectWPCommand() {
+    # Auto-detect wallpaper method
+    if [[ "$wpCommand" == "auto" ]]; then
+        while true; do
+            if pgrep gnome-session > /dev/null; then
+                echo "GNOME detected!"
+                wpCommand="gnome"
+                break
+            fi
+            if pgrep xfdesktop > /dev/null; then
+                echo "XFCE detected!"
+                wpCommand="xfce"
+                break
+            fi
+            if which feh > /dev/null; then
+                wpCommand="feh"
+                echo "Feh detected!"
+                if [[ "preferCommand" == "feh" ]]; then
+                    break
+                fi
+            fi
+            if which nitrogen > /dev/null; then
+                echo "Nitrogen detected!"
+                wpCommand="nitrogen"
+                break
+            fi
+            if [[ "$wpCommand" == "auto" ]]; then
+                echo "Error, no method for setting wallpaper found!"
+                exit 1
+            else
+                break
+            fi
+        done
+    fi
+}
+
+restoreWP ()
+{
+    case "$wpCommand" in
+        "feh")
+            eval $(sed -r 's/feh (--bg-[[:graph:]]+) (.*)/feh \1 "\2"/' ~/.fehbg)
+            #. ~/.fehbg 2>&1
+            echo "Wallpaper restored."
+            ;;
+        "nitrogen")
+            nitrogen --restore > /dev/null 2>&1
+            echo "Wallpaper restored."
+            ;;
+        "xfce")
+            echo "No need!"
+            ;;
+        "gnome")
+            echo "No Need!"
+            ;;
+        *)
+            echo "Unknown wallpaper back-end, aborting!"
+            exit 1
+    esac
+}
+
+setAuto ()
+{
+    case "$wpCommand" in
+        "xfce")
+            `$cmdAutoXfce "$1" > /dev/null 2>&1`
+            xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor$monitor/image-style -s 0 > /dev/null 2>&1
+            ;;
+        "gnome")
+            `$cmdTileGnome "$1" > /dev/null 2>&1`
+            ;;
+        *)
+            echo "Unknown wallpaper back-end, aborting!"
+            exit 1
+    esac
+
+    if [[ "$?" == "0" ]]; then
+        echo "Wallpaper tiled."
+    else
+        echo "Wallpaper not set!"
+        exit 1
+    fi
+}
+
+
+setTiled ()
+{
+    case "$wpCommand" in
+        "feh")
+            `$cmdTileFeh "$1" > /dev/null 2>&1`
+            ;;
+        "nitrogen")
+            `$cmdTileNitrogen "$1" > /dev/null 2>&1`
+            ;;
+        "xfce")
+            `$cmdTileXfce "$1" > /dev/null 2>&1`
+            xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor$monitor/image-style -s 2 > /dev/null 2>&1
+            ;;
+        "gnome")
+            `$cmdTileGnome "$1" > /dev/null 2>&1`
+            ;;
+        *)
+            echo "Unknown wallpaper back-end, aborting!"
+            exit 1
+    esac
+
+    if [[ "$?" == "0" ]]; then
+        echo "Wallpaper tiled."
+    else
+        echo "Wallpaper not set!"
+        exit 1
+    fi
+}
+
+setScaled ()
+{
+    case "$wpCommand" in
+        "feh")
+            `$cmdScaleFeh "$1" > /dev/null 2>&1`
+            ;;
+        "nitrogen")
+            `$cmdScaleNitrogen "$1" > /dev/null 2>&1`
+            ;;
+        "xfce")
+            $cmdScaleXfce "$1" > /dev/null 2>&1
+            xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor$monitor/image-style -s 4 > /dev/null 2>&1
+            ;;
+        "gnome")
+            `$cmdScaleGnome "$1" > /dev/null 2>&1`
+            ;;
+        *)
+            echo "Unknown wallpaper back-end, aborting!"
+            exit 1
+    esac
+
+    if [[ "$?" == "0" ]]; then
+        echo "Wallpaper scaled."
+    else
+        echo "Wallpaper not set!"
+        exit 1
+    fi
+}
+
+setCentered ()
+{
+    case "$wpCommand" in
+        "feh")
+            `$cmdCenterFeh "$1" > /dev/null 2>&1`
+            ;;
+        "nitrogen")
+            `$cmdCenterNitrogen "$1" > /dev/null 2>&1`
+            ;;
+        "xfce")
+            $cmdCenterXfce "$1" > /dev/null 2>&1
+            xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor$monitor/image-style -s 1 > /dev/null 2>&1
+            ;;
+        "gnome")
+            `$cmdCenterGnome "$1" > /dev/null 2>&1`
+            ;;
+        *)
+            echo "Unknown wallpaper back-end, aborting!"
+            exit 1
+    esac
+
+    if [[ "$?" == "0" ]]; then
+        echo "Wallpaper centered."
+    else
+        echo "Wallpaper not set!"
+        exit 1
+    fi
+}
+
+setZoomed ()
+{
+    case "$wpCommand" in
+        "feh")
+            `$cmdZoomFeh "$1" > /dev/null 2>&1`
+            ;;
+        "nitrogen")
+            `$cmdZoomNitrogen "$1" > /dev/null 2>&1`
+            ;;
+        "xfce")
+            $cmdZoomXfce "$1" > /dev/null 2>&1
+            xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor$monitor/image-style -s 5 > /dev/null 2>&1
+            ;;
+        "gnome")
+            `$cmdZoomGnome "$1" > /dev/null 2>&1`
+            ;;
+        *)
+            echo "Unknown wallpaper back-end, aborting!"
+            exit 1
+    esac
+
+    if [[ "$?" == "0" ]]; then
+        echo "Wallpaper zoomed."
+    else
+        echo "Wallpaper not set!"
+        exit 1
+    fi
+}
+
+createLists ()
+{
+    # Test If lists are writable
+    if [[ !( ( -w "$wpListRand" ) && ( -w "$wpListSeq" ) ) ]]; then
+        echo "Can't write wallpaper lists, aborting!"
+        exit 1
+    fi
+
+    # Go to the first wallpaper directory
+    cd "$wpDirRand"
+
+    # Load the list of pictures to a variable
+    wpDirList=`(find . -regex ".*\([jJ][pP][gG]\|[jJ][pP][eE][gG]\|[gG][iI][fF]\|[pP][nN][gG]\|[bB][mM][pP]\)$"  -type f | sort)`
+
+    # Save the list to disk
+    echo -n "$wpDirList" > "$wpListRand"
+
+    # Filter out unwanted folders
+    if [[ "$dontSkip" == "false" ]]; then
+        for dir in "${wpSkip[@]}"
+        do
+            grep -Ev "$dir" "$wpListRand" > ~/.bashwall-tmp; mv ~/.bashwall-tmp "$wpListRand"
+        done
+    fi
+
+    if [[ "$wpDirRand" == "$wpDirSeq" ]]; then
+        cp "$wpDirRand" "$wpDirSeq"
+    else
+        # Go to the second wallpaper directory
+        cd "$wpDirSeq"
+
+        # Load the list of pictures to a variable
+        wpDirList=`(find . -regex ".*\([jJ][pP][gG]\|[jJ][pP][eE][gG]\|[gG][iI][fF]\|[pP][nN][gG]\|[bB][mM][pP]\)$"  -type f | sort)`
+
+        # Save the list to disk
+        echo -n "$wpDirList" > "$wpListSeq"
+
+        # Filter out unwanted folders
+        if [[ "$dontSkip" == "false" ]]; then
+            for dir in "${wpSkip[@]}" ; do
+                grep -Ev "$dir" "$wpListSeq" > ~/.bashwall-tmp; mv ~/.bashwall-tmp "$wpListSeq"
+            done
+        fi
+    fi
+
+    # Output result
+    echo 1 >> "$wpListSeq"
+    echo "Wallpaper lists saved."
+}
+
+getImageRand ()
+{
+    # Check if the wallpaper list exists, is not empty and we have read persmission on it
+    if [[ !( ( -s "$wpListRand" && -f "$wpListRand" ) && -r "$wpListRand" ) ]]; then
+        echo "Can't read wallpaper list, aborting!";
+        exit 1
+    fi
+
+    # Count number of pictures in the wallpaper list by counting number of lines.
+    wpListNumber=$(wc -l < "$wpListRand")
+
+    # Counter for bad entries in wallpaper list
+    #badMax=100
+
+    while true; do
+        # Get a seed for the random number generator from /dev/urandom
+        SEED=$(head -1 /dev/urandom | od -N 1 | awk '{ print $2 }')
+        RANDOM=$SEED
+
+        # Find a random line number in the wallpaper list
+        # Random number from 1..n.
+        #r=$((RANDOM % $wpListNumber + 1))
+        r=$(echo $RANDOM%"$wpListNumber"+1 | bc)
+
+        # Print what the line number is
+        # Print the r'th line.
+        imgPath=`sed -n "$r{p;q;}" "$wpListRand"`
+        # #./ crops that substring but it doesn't matter if it left there
+        wpPath="${wpDirRand}${imgPath#./}"
+
+        # Check if the chosen file exists
+        if [ -f "$wpPath" ]; then
+            break
+        else
+            echo -e ""$wpPath": doesn't exist!\n"
+            badMax=$(( $badMax - 1 ))
+            if [ "$badMax" == "0" ]; then
+                echo "Too many non-valid entries found in wallpaper list, updating list.."
+                createLists
+                if [[ `wc -l < $wpListRand` -le "0" ]]; then
+                    exit 1
+                fi
+            else
+                echo "Choosing new image..."
+            fi
+            continue
+        fi
+    done
+}
+
+getImageSeq ()
+{
+    # Check if the wallpaper list exists, is not empty and we have read persmission on it
+    if [[ !( ( -s "$wpListSeq" && -f "$wpListSeq" ) && -r "$wpListSeq" ) ]]; then
+        echo "Can't read wallpaper list, aborting!";
+        exit 1
+    fi
+
+    # Count number of pictures in the wallpaper list by counting number of lines.
+    wpListNumber=$(wc -l < "$wpListSeq")-1
+
+    # Counter for bad entries in wallpaper list
+    #badMax=100
+
+    # Read wallpaper list to see the number of last wallpaper set
+    r=`tail -n 1 "$wpListSeq"`
+
+    while true; do
+        if $(echo ""$r"" | grep [^0-9] &>/dev/null); then
+            echo "Wallpaper list corrupted, aborting!"
+            exit 1
+        fi
+
+        # Print what the line number is
+        # Print the r'th line.
+        imgPath=`sed -n "$r{p;q;}" "$wpListSeq"`
+        # #./ crops that substring but it doesn't matter if it left there
+        wpPath="${wpDirSeq}${imgPath#./}"
+
+        # Check if the chosen file exists
+        if [ -f "$wpPath" ]; then
+            break
+        else
+            echo -e ""$wpPath": doesn't exist!\n"
+            badMax=$(( $badMax - 1 ))
+            if [ "$badMax" == "0" ]; then
+                echo "Too many non-valid entries found in wallpaper list, updating list.."
+                createLists
+                if [[ `wc -l < $wpListSeq` -le "1" ]]; then
+                    exit 1
+                fi
+            else
+                echo "Choosing new image..."
+                if [[ "$r" -lt "$wpListNumber" ]]; then
+                    r=$(( $r + 1 ))
+                else
+                    r=1
+                fi
+            fi
+            continue
+        fi
+    done
+}
+
+setImage () {
+
+    if [[ $2 != "yes" ]]; then
+        setZoomed "$1";
+        return
+    fi
+
+    # Calculate size and aspect for chosen image and print out information
+    imgHeight=$(identify -format "%h" "$1")
+    imgWidth=$(identify -format "%w" "$1")
+    imgAspect=$(echo "scale=1; "$imgWidth"/"$imgHeight"" | bc)
+    echo -e "Image: "$1"\n"
+    echo -e "Resolution: "$imgWidth"x"$imgHeight""
+    echo -e "Aspect: "$imgAspect":1\n"
+
+    # Calculate resolution aspect ratio
+    resAspect=$(echo "scale=1; "$resWidth"/"$resHeight"" | bc)
+
+    if [[ ("$wpCommand" == "xfce" && "$wpAlwaysAuto" == "yes") ]]; then
+        setAuto "$1"
+        return
+    fi
+
+    # If the image is smaller than the resolution and is not a tile then scale it, otherwise look at aspect
+    if [[ ( "$imgAspect" != "1.0" && ("$imgWidth" -lt "$resWidth" || "$imgHeight" -lt "$resHeight") ) ]]; then
+        if [[ "$lowerRes" == "scale" ]]; then
+            setScaled "$1"
+            return
+        elif [[ "$lowerRes" == "zoom" ]]; then
+            setZoomed "$1"
+            return
+        fi
+    fi
+
+    case $imgAspect in
+        1.0)
+            setTiled "$1"
+            ;;
+        1.5 | 1.6 | 1.7 | 1.8)
+            if [[ "$resAspect" < "1.5" ]]; then
+                setCentered "$1"
+            else
+                setScaled "$1"
+            fi
+            ;;
+        *)
+            if [[ "$resAspect" < "1.5" ]]; then
+                setScaled "$1"
+            else
+                setCentered "$1"
+            fi
+            ;;
+    esac
+
+    if [[ "$refreshX" == "yes" ]]; then
+        xrefresh
+    fi
+}
+
+checkConfig ()
+{
+    # Initial errors
+    errorsNum=0
+    dontSkip="false"
+
+    # Check if bc is installed
+    which bc &> /dev/null
+    if [[ "$?" != "0" ]]; then
+        echo "You don't seem to have bc installed. Aborting!"
+        exit 1
+    fi
+
+    # Check if imagemagick is installed
+    which identify &> /dev/null
+    if [[ "$?" != "0" ]]; then
+        echo "You don't seem to have the identify tool from imagemagick installed. Aborting!"
+        exit 1
+    fi
+    which convert &> /dev/null
+    if [[ "$?" != "0" ]]; then
+        echo "You don't seem to have the convert tool from imagemagick installed. Aborting!"
+        exit 1
+    fi
+
+    # Check if all variables are set
+    if [[ !( ( -n "$wpDirRand" ) && ( -n "$wpDirSeq" ) && ( -n "$wpListRand" ) && ( -n "$badMax" ) && ( -n "$wpListSeq" ) && \
+        ( -n "$resWidth" ) && ( -n "$resHeight" ) && ( -n "$lowerRes" ) && ( -n "$preferCommand" ) && ( -n "$wpCommand" ) ) ]]; then
+    echo -e "\nOne or more options not set, aborting!"
+    exit 1
+fi
+
+# Check if there is a trailing backslash in the wallpaper directories
+spDir=`echo -n "$wpDirRand" | tail -c -1`
+if [[ !( "$spDir" == "/" ) ]]; then
+    wpDirRand=""$wpDirRand"/"
+fi
+
+spDir=`echo -n "$wpDirSeq" | tail -c -1`
+if [[ !( "$spDir" == "/" ) ]]; then
+    wpDirSeq=""$wpDirSeq"/"
+fi
+
+# Check if there is read permission on wallpaper directories and if they are directories
+if [[ !( ( -r "$wpDirRand" ) && ( -d "$wpDirRand" ) && ( -r "$wpDirSeq" ) && ( -d "$wpDirSeq" ) ) ]]; then
+    echo "Can't read wallpaper directory!"
+    errorsNum=$(( $errorsNum + 1 ))
+fi
+
+# Check if the specified wallpaper lists are regular files and not directories
+touch "$wpListRand" &> /dev/null
+touch "$wpListSeq" &> /dev/null
+if [[ ( ( -d "$wpListRand" ) && ( -d "$wpListSeq" ) ) ]]; then
+    echo "Specified wallpaper list(s) are a directory, not a file!"
+    errorsNum=$(( $errorsNum + 1 ))
+fi
+
+# Check if variables are set correctly
+if [[ !( "$lowerRes" == "center" || "$lowerRes"  == "scale" || "$lowerRes" == "zoom") ]]; then
+    echo "Specified option for handling low resolution images is not valid!"
+    errorsNum=$(( $errorsNum + 1 ))
+fi
+
+if [[ !( "$refreshX" == "yes" || "$refreshX"  == "no" ) ]]; then
+    echo "Specified option for refreshing X is not valid!"
+    errorsNum=$(( $errorsNum + 1 ))
+fi
+
+if [[ !( "$preferCommand" == "feh" || "$preferCommand"  == "nitrogen" ) ]]; then
+    echo "Specified option for preferred wallpaper command when no DE detected is not valid!"
+    errorsNum=$(( $errorsNum + 1 ))
+fi
+
+if $(echo ""$resWidth"" | grep [^0-9] &>/dev/null); then
+    echo "Specified resolution width is not a number!"
+    errorsNum=$(( $errorsNum + 1 ))
+fi
+
+if $(echo ""$resHeight"" | grep [^0-9] &>/dev/null); then
+    echo "Specified resolution height is not a number!"
+    errorsNum=$(( $errorsNum + 1 ))
+fi
+
+# Check if any of the tests failed
+if [[ "$errorsNum" -gt "0" ]]; then
+    echo -e "\n$errorsNum error(s) found, aborting!"
+    exit 1
+fi
+}
+
+updateRecordSeq ()
+{
+    sed '$d' < "$wpListSeq" > $HOME/.bashwall-tmp ; mv $HOME/.bashwall-tmp "$wpListSeq"
+    if [[ "$r" -lt "$wpListNumber" ]]; then
+        r=$(( $r + 1 ))
+        echo "$r" >> "$wpListSeq"
+    else
+        r=1
+        echo "$r" >> "$wpListSeq"
+    fi
+}
+
+ignoreWPSkip()
+{
+    dontSkip="true"
+}
+
+printUsage ()
+{
+    cat << EOF
+    Usage:
+    `basename "$0"` [options] image
+
+    Options:
+    -sa | --set-auto        Set the specified image as wallpaper
+    -ss | --set-seq         Set the next wallpaper in sequence mode
+    -sr | --set-random      Set a random wallpaper
+    -u  | --update          Update (or create) the lists
+    -ua | --update-all      Update (or create) the lists, but don't skip any folders
+    -r  | --restore         Restore the previously set wallpaper
+    EOF
+    exit 1
+}
+
+if [[ "$#" == "1" ]]; then
+    case "$1" in
+        "-sr" | "--set-random")
+            checkConfig
+            getImageRand
+            detectWPCommand
+            setImage "$wpPath" "no"
+            exit 0
+            ;;
+        "-ss" | "--set-seq")
+            checkConfig
+            getImageSeq
+            detectWPCommand
+            setImage "$wpPath" "no"
+            updateRecordSeq
+            exit 0
+            ;;
+        "-u" | "--update")
+            checkConfig
+            createLists
+            exit 0
+            ;;
+        "-ua" | "--update-all")
+            checkConfig
+            ignoreWPSkip
+            createLists
+            exit 0
+            ;;
+        "-r" | "--restore")
+            detectWPCommand
+            restoreWP
+            exit 0
+            ;;
+        *)
+            printUsage
+            exit 1
+            ;;
+    esac
+elif [[ "$#" == "2" ]]; then
+    case "$1" in
+        "-sa" | "--set-auto")
+            detectWPCommand
+            setImage "$2" "no"
+            exit 0
+            ;;
+        "-rd" | "--rand-dir")
+            getImageDir
+            detectWPCommand
+            setImage "$wpPath"
+            exit 0
+            ;;
+        *)
+            printUsage
+            exit 1
+            ;;
+    esac
+else
+    printUsage
+    exit 1
+fi

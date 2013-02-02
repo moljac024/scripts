@@ -1,0 +1,24 @@
+#!/bin/bash
+#------------------------------
+# A script for opening links in a browser the smart way:
+# Check to see which browser is running and display the link in that one.
+# If multiple browsers are running the link is opened in the first one detected.
+# The order of checking can therefore be changed to provide priorities.
+#------------------------------
+# Configuration:
+#------------------------------
+DEFAULT_BROWSER="google-chrome"
+BROWSER_LIST=( "google-chrome" "firefox" "opera" )
+#-------------------------------
+
+THIS_SCRIPT=`basename $0`
+for INDEX in 1 2 3; do
+    BROWSER="${BROWSER_LIST[INDEX]}"
+    if ps aux | egrep -v "grep|"$THIS_SCRIPT"" | grep "$BROWSER" > /dev/null; then
+        $BROWSER "$@" &
+        exit 0
+    fi
+done
+
+$DEFAULT_BROWSER "$@" &
+exit 0

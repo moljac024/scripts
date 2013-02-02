@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Check if curl is installed
+which curl &> /dev/null
+if [[ "$?" != "0" ]]; then
+    echo "error: curl not found"
+    exit 1
+fi
+
+# Check if php is installed
+which php &> /dev/null
+if [[ "$?" != "0" ]]; then
+    echo "error: php not found"
+    exit 1
+fi
+
+# while [[ ! (-f ./composer.json) ]]; do
+#     cd ..
+#     if [[ $PWD == "/" ]]; then
+#         echo "error: no php project found"
+#         exit
+#     fi
+# done
+
+# If composer not present, download it, otherwise update
+if [[ ! -f ./composer.phar ]]; then
+    curl -s https://getcomposer.org/installer | php
+else
+    php ./composer.phar self-update
+fi
+
+if [[ "$@" != "self-update" ]]; then
+    php ./composer.phar $@
+fi

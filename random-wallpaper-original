@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Set your folder with the pics
+picsfolder="/data/Slike/Wallpapers/"
+
+#Set the Path to the Wallpaper list will be created
+wplistpath='/data/Slike/Wallpapers/.wallpaper-list'
+
+#go to the picture directory
+cd "$picsfolder"
+
+#load the list of pics to a variable
+wpDirList=`(find . -regex ".*\(jpg\|jpeg\|gif\|png\|svg\)$"  -type f)`
+#find the number of pics in the WP dir based on the extension
+numberOfPicsDir=`echo "$wpDirList" | wc -l`
+
+# Count number of pics in the Wallpaper list by counting number of lines.
+numberOfPicsList=0  #initial lise
+
+#check if the wallpaperlist Exists
+if [[ -e "$wplistpath" ]]
+then
+    numberOfPicsList=$(wc -l < "$wplistpath")
+else
+    echo "WP list does not exist"
+fi
+
+# inform the user
+echo $numberOfPicsDir" --- "$numberOfPicsList
+
+# if they don't match rewrite the wallpaper list
+# this if can be removed and the list can be saved every time
+
+if [ $numberOfPicsDir -ne $numberOfPicsList ]
+then
+    save the list to disk
+    echo -n "$wpDirList" > "$wplistpath"
+fi
+
+# Find a random line number in the wallpaper list
+r=$((RANDOM % numberOfPicsDir + 1))       # Random number from 1..n.
+
+# print what the line number is
+picPath=`sed -n "$r{p;q;}" "$wplistpath"`   # Print the r'th line.
+wpPath="${picsfolder}${picPath#./}"     # #./ crops that substring but it doesn't matter if it left there
+
+# set the wallpaper in Gnome Config Editor
+gconftool-2 -t str --set /desktop/gnome/background/picture_filename "$wpPath"

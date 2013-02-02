@@ -1,0 +1,6 @@
+#!/bin/bash
+
+DF_PATH="$HOME/Igre/Dwarf_Fortress/df_linux_34_10"
+
+cd $DF_PATH && ./df
+exit 0;

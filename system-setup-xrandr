@@ -1,0 +1,13 @@
+#!/bin/bash
+#------------------------------
+# Xranrd initialization
+#------------------------------
+
+#xrandr --output LVDS1 --auto
+
+if xrandr -q | grep "VGA1 disconnected" >/dev/null; then
+    xrandr --output VGA1 --off
+elif xrandr -q | grep "VGA1 connected" >/dev/null; then
+    xrandr --output VGA1 --auto --below LVDS1
+fi
+

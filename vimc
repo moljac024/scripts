@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Connect to the first vim server found, or start regular vim
+#NUM_SERVERS=`vim --serverlist | wc -l`
+#if [ $NUM_SERVERS -gt 0 ];
+#then
+    #FIRST_SERVER=`vim --serverlist | head -1`
+    #vim --servername $FIRST_SERVER --remote $@
+#else
+    #vim $@
+#fi
+
+# Connect to console vim server
+VIM_SERVER_NAME="CVIM"
+VIM_SERVER_INSTANCE=`vim --serverlist | grep $VIM_SERVER_NAME`
+if [[ $VIM_SERVER_INSTANCE != "" ]];
+then
+    vim --servername $VIM_SERVER_NAME --remote $@
+else
+    vim --servername $VIM_SERVER_NAME $@
+fi

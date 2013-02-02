@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [[ "$#" != "1" ]]; then
+   echo "Error, can only take one argument!"
+   exit 1
+fi
+
+fullpath=`readlink -f "$1"`
+fullname=$(basename "$1")
+filename=${fullname%.*}
+extension=${fullname##*.}
+
+mplayer -dumpaudio "$fullpath" -dumpfile "$filename.mp3"

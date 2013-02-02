@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [[ "$1" == "arch" ]]; then
+    if [[ !( -L ~/public_html ) ]]; then
+        ln -s ~/Development/Web ~/public_html
+        chmod o+x ~/; chmod o+x ~/public_html
+        echo "Symbolic link created!"
+    fi
+
+    chmod o+x ~/Development/Web
+    #chmod -R o+x ~/Development/Web
+
+    sudo /etc/rc.d/httpd start
+    sudo /etc/rc.d/mysqld start
+fi
+
+if [[ "$1" == "fedora" ]]; then
+    sudo service httpd start
+    sudo service mysqld start
+fi
+
+if [[ "$1" == "ubuntu" ]]; then
+    sudo service apache2 start
+    sudo service mysql start
+fi

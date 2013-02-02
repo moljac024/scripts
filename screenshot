@@ -1,0 +1,27 @@
+#!/bin/bash
+#-----------------------
+# A script for taking a screenshot, by moljac024
+#-----------------------
+# Configuration:
+DIRECTORY="/mnt/data/Slike/Screenshots/"
+#-----------------------
+
+set -o nounset
+
+if [[ "$#" -lt "1" ]]; then
+    scrot "$DIRECTORY"/'%Y%m%d-%H%M%S'.png
+    exit 0
+fi
+
+if [[ "$1" == "-s" ]]; then
+    notify-send "Please select a region for screenshot"
+    scrot -s "$DIRECTORY"/'%Y%m%d-%H%M%S'.png
+    exit 0
+elif [[ "$1" == "-d" ]]; then
+    scrot -d 3 "$DIRECTORY"/'%Y%m%d-%H%M%S'.png
+    exit 0
+else
+    scrot "$DIRECTORY"/'%Y%m%d-%H%M%S'.png
+    exit 0
+fi
+

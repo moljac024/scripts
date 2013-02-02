@@ -1,0 +1,96 @@
+#!/bin/bash
+#------------------------------
+# A script for battery monitoring, by moljac024
+#------------------------------
+# Configuration:
+CRITICAL_LEVEL=10
+ICON="/usr/share/ICONs/gnome/32x32/status/battery-low.png"
+BATTERY_ID="BAT1"
+AC_ADAPTER_ID="ADP1"
+LOCK_FILE=$HOME/.battery-monitor
+#------------------------------
+
+
+function checkBattery ()
+{
+    if [ "$(grep -o off /proc/acpi/ac_adapter/$AC_ADAPTER_ID/state)" == "off" ]
+    then
+        battery_max=`awk ' NR==3 {print $4}' /proc/acpi/battery/$BATTERY_ID/info`
+        battery_current=`awk ' NR==5 {print $3}' /proc/acpi/battery/$BATTERY_ID/state`
+        battery_level=$((100*$battery_current/$battery_max))
+        echo $battery_level
+        if [ $battery_level -le $CRITICAL_LEVEL ]
+        then
+            dzen-msg 'Warning! Battery level is low!'
+            #notify-send -u critical -i "$ICON" -t 15000 'Battery level is low!' "Only ${battery_level}% of the charge remains."
+        fi
+    fi
+}
+
+# Check command line argument and start monitoring
+if [ "$#" != "1" ]; then
+    echo -e "Invalid command line argument(s), must supply one integer argument!\n"
+    echo -e "If argument is 0 monitoring stops, otherwise it checks battery every Nth second"
+    exit 1
+fi
+
+if $(echo ""$1"" | grep [^0-9] &>/dev/null); then
+    echo "Specified argument is not a number!"
+    exit 1
+fi
+
+if [[ "$1" == "0" ]]; then
+    if [ -f "${LOCK_FILE}" ]; then
+        myPID=`head -n 1 "${LOCK_FILE}"`
+        testRunning=`ps -p ${myPID} | grep ${myPID}`
+        if [ -z "${testRunning}" ]; then
+            echo "Monitoring isn't in progress!"
+            rm -f "${LOCK_FILE}"
+            exit 0
+        else
+            kill "$myPID"
+            echo "Monitoring stopped!"
+            rm -f "${LOCK_FILE}"
+            exit 0
+        fi
+    else
+        echo "Monitoring isn't in progress!"
+        exit 0
+    fi
+fi
+
+# Is monitoring already in progress ?
+if [ -f "${LOCK_FILE}" ]; then
+
+    # The file exists so read the PID
+    # to see if it is still running
+    myPID=`head -n 1 "${LOCK_FILE}"`
+
+    testRunning=`ps -p ${myPID} | grep ${myPID}`
+
+    if [ -z "${testRunning}" ]; then
+        # The process is not running
+        # Echo current PID into lock file
+        echo "Starting battery monitoring.."
+        echo $$ > "${LOCK_FILE}"
+    else
+        echo "Restarting battery monitoring.."
+        kill "$myPID"
+        echo $$ > "${LOCK_FILE}"
+    fi
+
+else
+    echo "Starting battery monitoring.."
+    echo $$ > "${LOCK_FILE}"
+fi
+
+while true
+do
+    checkBattery
+    if [[ "$?" != "0" ]]; then
+        echo "Error!"
+        rm -f "${LOCK_FILE}"
+        exit 1
+    fi
+    sleep "$1"s
+done

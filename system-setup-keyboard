@@ -1,0 +1,24 @@
+#!/bin/bash
+#------------------------------
+# X keyboard setup
+#------------------------------
+
+# Repeat delay and rate
+xset r rate 500 25
+
+# Run xmodmap if neccesarry
+# if [ -f ~/.Xmodmap ]; then
+#     xmodmap ~/.Xmodmap
+# elif [ -f ~/.xmodmap ]; then
+#     xmodmap ~/.xmodmap
+# fi
+
+# Make caps lock additional control
+setxkbmap -option "ctrl:nocaps"
+
+# Set up keyboard layout switching
+setxkbmap -layout us,rs -variant ,latinyz
+setxkbmap -option "grp:alt_shift_toggle"
+
+# Turn on numlock
+command -v numlockx >/dev/null 2>&1 && numlockx &

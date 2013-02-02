@@ -1,0 +1,12 @@
+#!/bin/bash
+#------------------------------
+# A script for launching a download window, by moljac024
+#------------------------------
+# Configuration:
+#------------------------------
+DOWNLOAD_DIR="$HOME/Downloads"
+TITLE="Download"
+#------------------------------
+
+cd $DOWNLOAD_DIR
+terminal --title=$TITLE -x curl -C - -0 "$@"

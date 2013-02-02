@@ -1,0 +1,20 @@
+#!/bin/bash
+#--------------------------------
+# A script for closing the currently focused window
+#--------------------------------
+
+THIS_SCRIPT=`basename $0`
+
+if "$1" == "xmonad"; then
+    if ps aux | egrep -v "grep|"$THIS_SCRIPT"" | grep xmonad; then
+        ~/.xmonad/xmonad-client 25
+        exit 0
+    else
+        echo "XMonad not running, using wmctrl..."
+        wmctrl -c :ACTIVE:
+        exit 0
+    fi
+else
+    wmctrl -c :ACTIVE:
+    exit 0
+fi

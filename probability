@@ -1,0 +1,37 @@
+#!/bin/bash
+if [ -z "$1" ]; then
+    echo "Please run like so: 'sh "$0" <highest number on dice>'"
+else
+    WOW=`echo "$1*2" | bc`
+    for X in 1 2 3 4 5; do
+        ONE=`seq 1 $1 | sort -R | head -1`
+        TWO=`seq 1 $1 | sort -R | head -1`
+        HAH=`echo "$ONE+$TWO" | bc`
+        if [ $HAH -eq "$WOW" ]; then
+            echo "$HAH" >> ~/probability.log
+        fi
+        until [ $HAH -eq $WOW ]; do
+            ONE=`seq 1 $1 | sort -R | head -1`
+            TWO=`seq 1 $1 | sort -R | head -1`
+            HAH=`echo "$ONE+$TWO" | bc`
+            NUM=`echo "1"`
+            echo "$HAH" >> ~/probability.log
+        done
+        LOL=`cat ~/probability.log | wc -l`
+        echo "Trial #$X: $LOL Rolls"
+        echo "$LOL" >> ~/probable.log
+        if [ -n "~/probability.log" ]; then
+            rm ~/probability.log &> /dev/null
+        fi
+    done
+    FINAL=`cat ~/probable.log | xargs > ~/probable.log`
+    sleep 0.5
+    set `cat ~/probable.log`
+    SUM=$(( $1 + $2 + $3 + $4 + $5))
+    ANSWER=$(echo "${SUM}/5" | bc)
+    sleep 0.5
+    if [ -n "~/probable.log" ]; then
+        rm ~/probable.log &> /dev/null
+    fi
+    echo "Average Number of Rolls: $ANSWER"
+fi

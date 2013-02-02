@@ -1,0 +1,43 @@
+#!/bin/bash
+
+MOUNT_POINT="/mnt/boot"
+MOUNT_DEV="/dev/disk/by-label/moljacboot"
+SRC="/boot"
+
+if [[ $EUID != 0 ]]; then
+    echo "Must be root for this!"
+    exit 1
+fi
+
+if [[ $PWD == $MOUNT_POINT ]]; then
+    cd ..
+fi
+
+echo -n "Checking if $MOUNT_POINT mounted..."
+
+if ! cat /proc/mounts | grep $MOUNT_POINT > /dev/null; then
+    echo -n "mounting..."
+    if ! mount $MOUNT_DEV; then
+        echo "Device mount error!"
+        exit 1
+    fi
+fi
+
+echo -e "ok\nSyncing in progress..."
+
+if ! rsync -av $SRC/ $MOUNT_POINT; then
+    echo "Syncing error!"
+    exit 1
+fi
+
+sync
+
+echo -n "Unmounting $MOUNT_POINT..."
+
+if ! umount $MOUNT_POINT; then
+    echo "Unmounting error!"
+    exit 1
+fi
+
+echo "ok"
+exit 0

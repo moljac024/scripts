@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [[ "$1" == "arch" ]]; then
+    sudo /etc/rc.d/httpd stop
+    sudo /etc/rc.d/mysqld stop
+fi
+
+if [[ "$1" == "fedora" ]]; then
+    sudo service httpd stop
+    sudo service mysqld stop
+fi
+
+if [[ "$1" == "ubuntu" ]]; then
+    sudo service apache2 stop
+    sudo service mysql stop
+fi

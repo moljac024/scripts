@@ -1,0 +1,14 @@
+#!/bin/bash
+#------------------------------
+# Xorg setup
+#------------------------------
+
+# Run xrdb if necessary
+if [ -f ~/.Xdefaults ]; then
+    xrdb -merge .Xdefaults
+elif [ -f ~/.Xresources ]; then
+    xrdb -merge .Xresources
+fi
+
+# DPMS timeout
+#xset dpms 300 600 900

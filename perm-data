@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [[ "$EUID" != 0 ]]; then
+    echo "Must be root old boy!"
+    exit 1
+fi
+
+chown -R bojan:users /mnt/data
+if [[ -d /mnt/data/lost+found ]]; then
+    chown -R root:root /mnt/data/lost+found
+fi
+
+chmod -R 770 /mnt/data
+chmod -R a-x+X /mnt/data
+

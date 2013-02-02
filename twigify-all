@@ -1,0 +1,4 @@
+#!/bin/bash
+#------------------------------
+
+find ./ -type f -name \*.html.twig -exec twigify $@ {} \;

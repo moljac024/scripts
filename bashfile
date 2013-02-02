@@ -1,0 +1,349 @@
+#!/bin/bash
+#------------------------------
+# Batch file manipulation utility, by moljac024
+#------------------------------
+# Configuration:
+zenityTitle="Bash File Operations"
+#------------------------------
+
+# Scripting wise
+#set -o nounset
+
+printUsage() {
+    cat << EOF
+    Usage:
+    `basename "$0"` [operation] [option | gui] [file or file directory]
+
+    Operations:
+    --img-frame         Add a frame, or border, to image file(s) (option is number)
+    --img-resize        Resize image(s) (option is number - percentage to resize to)
+    --img-canvas        Add image file(s) on to canvas (option is canvas)
+    --img-book-canvas   Add image file(s) on to canvas (option is canvas)
+    EOF
+    exit 0
+}
+
+printError () {
+    if [[ "$1" == "gui" ]]; then
+        zenity --error --title="$zenityTitle" --text="$2"
+        exit 1
+    else
+        echo "$2"
+        exit 1
+    fi
+}
+
+printSuccess () {
+    if [[ "$1" == "gui" ]]; then
+        zenity --info --title="$zenityTitle" --text="$2"
+        exit 0
+    else
+        echo "$2"
+        exit 0
+    fi
+}
+
+checkErrors () {
+    # Check if imagemagick is installed
+    which identify > /dev/null
+    if [[ "$?" != "0" ]]; then
+        printError "$2" "imagemagick tool not detected!"
+    fi
+    which convert > /dev/null
+    if [[ "$?" != "0" ]]; then
+        printError "$2" "imagemagick tool not detected!"
+    fi
+
+    which printf > /dev/null
+    if [[ "$?" != "0" ]]; then
+        printError "$2" "printf tool not detected!"
+    fi
+    which bc > /dev/null
+    if [[ "$?" != "0" ]]; then
+        printError "$2" "bc tool not detected!"
+    fi
+
+    # Set default variables
+    if [[ -z "$zenityTitle" ]]; then
+        zenityTitle="Bash File Operations"
+    fi
+    if [[ -z "$file_criteria" ]]; then
+        file_criteria="file"
+    fi
+    if [[ -z "$name_criteria" ]]; then
+        name_criteria=""
+    fi
+}
+
+getFileInfo () {
+    fullpath=`readlink -f "$1"`
+    fullname=`basename "$1"`
+    filename=${fullname%.*}
+    extension=${fullname##*.}
+}
+
+mainFileOps () {
+    if [[ -f "$3" ]]; then
+
+        if [[ !( -w `pwd` ) ]]; then
+            printError "$2" "Error! Can't write to directory!"
+        fi
+
+        getFileInfo "$3"
+        if [[ `file "$fullpath" | grep "$file_criteria"` == "" ]]; then
+            printError "$2" ""$3" does not meet file criteria!"
+        fi
+        fileOperation "$1" "$2" "$3" "$3" "$filename.$operation.$extension"
+        printSuccess "$2" "File proccessed succesfully!"
+
+    elif [[ -d "$3" ]]; then
+
+        if [[ !( -w "$3" ) ]]; then
+            printError "$2" "Error! Can't write to the directory!"
+        fi
+
+        # Go to folder
+        cd "$3"
+
+        # Make directory where files will be stored if it doesn't exist
+        if [[ !( -d "$operation") ]]; then
+            mkdir "$operation" &> /dev/null
+        fi
+
+        # Count number of files
+        #fileNumber=`echo $fileList | wc -w`
+        fileNumber=`(ls | grep "$name_criteria") | wc -l`
+
+        if [[ "$fileNumber" -lt "1" ]]; then
+            printError "$2" "No files in directory meet criteria!"
+        fi
+
+        # Loop through files in directory
+        if [[ "$2" == "gui" ]]; then
+            step=$(echo "scale=2; "100"/"$fileNumber"" | bc)
+            i=$step
+            (ls | grep "$name_criteria" | while IFS= read -r file; do
+            getFileInfo "$file"
+            if [[ ( `file "$fullpath" | grep "$file_criteria"` != "" ) && !( -f "$operation"/"$file" ) ]]; then
+                fileOperation "$1" "$2" "$3" "$file" "$operation"/"$file"
+                #fileOperation "$1" "$2" "$3" "$file" "$operation"/"$filename.$operation.$extension"
+            fi
+            # Increment the progress bar
+            i=$(echo "scale=2; "$i"+"$step"" | bc)
+            #roundVal=`echo "tmp=$i; tmp /= 1; tmp" | bc`
+            roundVal=`printf %.0f $i`
+            echo "$roundVal"
+        done) | zenity --title="$zenityTitle" --progress --auto-close --auto-kill --text="Proccessing files..."
+    else
+        currFile=1
+        ls | grep "$name_criteria" | while IFS= read -r file; do
+        getFileInfo "$file"
+        echo "Proccessing file $currFile of $fileNumber"
+        if [[ ( `file "$fullpath" | grep "$file_criteria"` != "" ) && !( -f "$operation"/"$file" ) ]]; then
+            fileOperation "$1" "$2" "$3" "$file" "$operation"/"$file"
+            #fileOperation "$1" "$2" "$3" "$file" "$operation"/"$filename.$operation.$extension"
+        else
+            echo ""$file" does not meet file criteria or is already processed.."
+        fi
+        currFile=$(( $currFile + 1 ))
+    done
+fi
+printSuccess "$2" "File(s) proccessed succesfully!"
+        fi
+    }
+
+    argsFrame () {
+        # File and/or name criteria for this operation
+        file_criteria="image"
+        name_criteria=".*\([jJ][pP][gG]\|[jJ][pP][eE][gG]\|[gG][iI][fF]\|[pP][nN][gG]\|[bB][mM][pP]\)$"
+
+        if [[ "$2" == "gui" ]]; then
+            borderSize=`zenity --scale --title="Image frame" --text="Add frame of size?" --min-value=1 --max-value=100 --value=5 --step=1`
+            if [[ "$?" == "1" || "borderSize" == "" ]]; then
+                exit 0
+            fi
+            borderSize="$borderSize"x"$borderSize"
+        else
+            if $(echo $2 | grep [^0-9] &>/dev/null); then
+                echo "Specified argument is not a number!"
+                exit 1
+            else
+                borderSize="$2"x"$2"
+            fi
+        fi
+
+        if [[ "$4" == "black" ]]; then
+            borderColor="black"
+        else
+            borderColor="white"
+        fi
+    }
+
+    argsResize () {
+        # File and/or name criteria for this operation
+        file_criteria="image"
+        name_criteria=".*\([jJ][pP][gG]\|[jJ][pP][eE][gG]\|[gG][iI][fF]\|[pP][nN][gG]\|[bB][mM][pP]\)$"
+
+        # Get the desired resize percentage and check it
+        if [[ "$2" == "gui" ]]; then
+            resizePer=`zenity --scale --title="$zenityTitle" --text="Resize to percentage?" --min-value=1 --max-value=100 --value=50 --step=1`
+        else
+            resizePer="$2"
+        fi
+
+        if [[ "$resizePer" == "0" || "$resizePer" == "" ]]; then
+            exit 0
+        fi
+
+        # Check if provided arguments are numbers
+        if $(echo ""$resizePer"" | grep [^0-9] &>/dev/null); then
+            printError "$2" "Specified argument is not a number!"
+        fi
+
+        if [[ "$resizePer" -lt "1" ]]; then
+            resizePer=1
+        elif [[ "$resizePer" -ge "100" ]]; then
+            printError "$2" "Can't resize to 100% or more you tool!"
+        fi
+    }
+
+    argsCanvas () {
+        # File and/or name criteria for this operation
+        file_criteria="image"
+        name_criteria=".*\([jJ][pP][gG]\|[jJ][pP][eE][gG]\|[gG][iI][fF]\|[pP][nN][gG]\|[bB][mM][pP]\)$"
+
+        # Get the desired image canvas and check if it is an image
+        if [[ "$2" == "gui" ]]; then
+            imgCanvas=`zenity --file-selection --title="$zenityTitle" --text="What to use as canvas?"`
+        else
+            imgCanvas="$2"
+        fi
+
+        if [[ "$?" == "1" || "$imgCanvas" == "" ]]; then
+            exit 0
+        fi
+
+        # Get the full path for the canvas
+        imgCanvas=`readlink -f "$imgCanvas"`
+
+        # Check if canvas is an image file
+        if [[ !( -f "$imgCanvas" ) || `file "$imgCanvas" | grep "$file_criteria"` == "" ]]; then
+            printError "$2" "Provided argument is not an image file, can't use as canvas!"
+        fi
+
+        # Calculate canvas dimensions
+        canvasHeight=`identify -format "%h" "$imgCanvas"`
+        canvasWidth=`identify -format "%w" "$imgCanvas"`
+    }
+
+    argsBookCanvas () {
+        # File and/or name criteria for this operation
+        file_criteria="image"
+        name_criteria=".*\([jJ][pP][gG]\|[jJ][pP][eE][gG]\|[gG][iI][fF]\|[pP][nN][gG]\|[bB][mM][pP]\)$"
+
+        # Get the desired book cover side and bottom parts
+        if [[ "$4" == "choose" ]]; then
+            if [[ "$2" == "gui" ]]; then
+                imgCanvasBottom=`zenity --file-selection --title="$zenityTitle" --text="What to use as bottom cover?"`
+                imgCanvasSide=`zenity --file-selection --title="$zenityTitle" --text="What to use as side cover?"`
+            else
+                imgCanvasBottom="$2"
+                imgCanvasSide="$5"
+            fi
+        else
+            imgCanvasBottom="$HOME/Plato/Covers/canvases/book-cover-bottom-thin.png"
+            imgCanvasSide="$HOME/Plato/Covers/canvases/book-cover-side-thin.png"
+        fi
+
+        if [[ "$?" == "1" || "$imgCanvasBottom" == "" || "$imgCanvasSide" == "" ]]; then
+            exit 0
+        fi
+
+        # Get the full path for the canvas
+        imgCanvasBottom=`readlink -f "$imgCanvasBottom"`
+        imgCanvasSide=`readlink -f "$imgCanvasSide"`
+
+        # Check if canvas is an image file
+        if [[ !( -f "$imgCanvasBottom" ) || `file "$imgCanvasBottom" | grep "$file_criteria"` == "" ]]; then
+            printError "$2" "$imgCanvasBottom is not an image file, can't use as canvas!"
+        fi
+
+        if [[ !( -f "$imgCanvasSide" ) || `file "$imgCanvasSide" | grep "$file_criteria"` == "" ]]; then
+            printError "$2" "$imgCanvasSide is not an image file, can't use as canvas!"
+        fi
+
+        # Calculate image dimensions
+        canvasBottomHeight=`identify -format "%h" "$imgCanvasBottom"`
+        canvasBottomWidth=`identify -format "%w" "$imgCanvasBottom"`
+
+        canvasSideHeight=`identify -format "%h" "$imgCanvasSide"`
+        canvasSideWidth=`identify -format "%w" "$imgCanvasSide"`
+    }
+
+    fileOperation () {
+        case "$1" in
+            "--img-frame")
+                convert -bordercolor "$borderColor" -border "$borderSize" "$4" "$5"
+                ;;
+            "--img-resize")
+                convert -resize "$resizePer"% "$4" "$5"
+                ;;
+            "--img-canvas")
+                imgHeight=`identify -format "%h" "$fullpath"`
+                imgWidth=`identify -format "%w" "$fullpath"`
+                if [[ !(( "$imgWidth"  -ge "$canvasWidth" ) || ( "$imgHeight" -ge "$canvasHeight" ) || ( "$fullpath" == "$imgCanvas" )) ]]; then
+                    convert -bordercolor white -border 5x5 "$4" "$5"
+                    composite -gravity center "$5" "$imgCanvas" "$5"
+                fi
+                ;;
+            "--img-book-canvas")
+                imgHeight=`identify -format "%h" "$fullpath"`
+                imgWidth=`identify -format "%w" "$fullpath"`
+                let canvasWidth=$imgWidth+$canvasSideWidth
+                let canvasHeight=$imgHeight+$canvasBottomHeight
+                let canvasHeight=$canvasHeight-"3"
+                convert -crop "$canvasWidth"x"$coverBottomHeight"+0+0 +repage "$imgCanvasBottom" "$5"
+                convert -append "$4" "$5" "$5"
+                convert -crop "$canvasSideWidth"x"$canvasHeight"+0+0 +repage "$imgCanvasSide" "$imgCanvasSide.tmp"
+                composite -gravity northeast "$imgCanvasSide.tmp" "$5" "$5"
+                rm "$imgCanvasSide.tmp"
+                ;;
+            *)
+                printError "$2" "Internal Error!"
+                ;;
+        esac
+    }
+
+    if [[ "$#" -ge "3" ]]; then
+        case "$1" in
+            "--img-frame")
+                operation="frame"
+                checkErrors "$@"
+                argsFrame "$@"
+                mainFileOps "$@"
+                ;;
+            "--img-canvas")
+                operation="canvased"
+                checkErrors "$@"
+                argsCanvas "$@"
+                mainFileOps "$@"
+                ;;
+            "--img-book-canvas")
+                operation="book-canvased"
+                checkErrors "$@"
+                argsBookCanvas "$@"
+                mainFileOps "$@"
+                ;;
+            "--img-resize")
+                operation="resized"
+                checkErrors "$@"
+                argsResize "$@"
+                mainFileOps "$@"
+                ;;
+            *)
+                printUsage
+                ;;
+        esac
+    else
+        printUsage
+    fi

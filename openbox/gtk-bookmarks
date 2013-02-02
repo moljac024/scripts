@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""Provide GTK bookmarks as pipe menu for Openbox_.
+
+This script generates XML representing a menu with items
+that open a file manager at specific locations.  Besides
+the current user's home directory, the user's GTK
+bookmarks file is read and the contents are added to the
+menu.
+
+On a side note: I also (primarily, actually) used the
+ElementTree_ library to generate the needed XML.  It
+already comes with Python 2.5 and later, so it was a
+reasonable alternative to consider since it wouldn't
+introduce additional dependencies.
+
+However, tests with the ``timeit`` module showed that using
+``xml.etree.ElementTree`` is roughly about 35 times slower
+than the raw string approach, ``xml.etree.cElementTree``
+about 25 times.
+
+:Copyright: 2008 Jochen Kupperschmidt
+:Date: 31-Mar-2008
+:License: MIT
+
+.. _Openbox:        http://www.icculus.org/openbox/
+.. _ElementTree:    http://effbot.org/zone/element-index.htm
+"""
+
+from __future__ import with_statement
+import os.path
+
+
+BOOKMARKS = '~/.gtk-bookmarks'
+#FILEMANAGER = '/usr/bin/thunar'
+FILEMANAGER = '/home/bojan/.bin/custom-nautilus'
+
+def parse_bookmarks(lines):
+    for line in lines:
+        path, label = line.strip().partition(' ')[::2]
+        if not label:
+            label = os.path.basename(os.path.normpath(path))
+        yield path, label
+
+def create_menu(items):
+    yield '<?xml version="1.0" encoding="utf-8"?>'
+    yield '<openbox_pipe_menu>'
+    for path, label in items:
+        if path is None:
+            yield '<separator/>'
+        else:
+            yield ('<item label="%s"><action name="Execute">'
+                '<execute>%s</execute></action></item>'
+                % (label, ' '.join([FILEMANAGER, path])))
+    yield '</openbox_pipe_menu>'
+
+if __name__ == '__main__':
+    # Assemble a list of menu items.  An item having ``None``
+    # as the first element is turned into a separator.
+    items = [('~', 'Home'), ('/', 'Root'), (None, None)]
+    with open(os.path.expanduser(BOOKMARKS)) as f:
+        items.extend(parse_bookmarks(f))
+    print ''.join(create_menu(items))
+

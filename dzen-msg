@@ -1,0 +1,26 @@
+#!/bin/bash
+#-----------------------
+# A dzen notification script, by moljac024
+#-----------------------
+# Configuration:
+DZEN_FONT="-*-terminus-*-*-*-*-14-*-*-*-*-*-*-*"
+DZEN_BG="#000000"
+DZEN_FG="#ff0000"
+DZEN_WIDTH=1280
+DZEN_HEIGHT=18
+#DZEN_DURATION=5
+DZEN_X_POS=0
+DZEN_Y_POS=0
+#-----------------------
+
+if [[ "$#" -lt "1" ]]; then
+    MESSAGE="Testing, testing...you forgot to pass a message didn't you?"
+    DZEN_DURATION=5
+elif [[ "$#" == "1" ]]; then
+    MESSAGE="$1"
+else
+    DZEN_DURATION="$1"
+    MESSAGE="$2"
+fi
+
+echo "$MESSAGE" | dzen2 -p "$DZEN_DURATION" -bg "$DZEN_BG" -fg "$DZEN_FG" -fn "$DZEN_FONT" -x "$DZEN_X_POS" -y "$DZEN_Y_POS" -w "$DZEN_WIDTH" -h "$DZEN_HEIGHT" -e 'entertitle=grabmouse;leavetitle=ungrabmouse;button1=exit;button2=exit;button3=exit'

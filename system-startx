@@ -1,0 +1,28 @@
+#!/bin/bash
+#------------------------------
+# A script for starting Xorg, by moljac024
+#------------------------------
+# Configuration:
+# X starts on tty number:
+X_TTY=7
+#------------------------------
+
+# Check arguments
+if [[ "$#" -lt "1" ]]; then
+   display=0
+elif `echo "$1" | grep [^0-9] &>/dev/null`; then
+   #echo "Specified argument is not a number, defaulting to display :0"
+   display=0
+else
+   display="$1"
+fi
+
+# Start X or switch to it if it is already running
+if xdpyinfo -display :$display.0 &> /dev/null; then
+   echo "Switching to X..."
+   let tty=$display+$X_TTY
+   sudo chvt $tty
+else
+   echo "Starting X..."
+   exec ck-launch-session startx -- :$display &> /dev/null &
+fi

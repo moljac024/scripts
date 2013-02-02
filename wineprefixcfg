@@ -1,0 +1,10 @@
+#!/bin/bash
+
+WINEPREFIX_DIR="$HOME/.wine-bottles"
+
+if [[ "$#" != 1 ]]; then
+    echo "Must provide single argument - name of wineprefix to configure"
+    exit 0
+fi
+
+WINEPREFIX="$WINEPREFIX_DIR/$1" winecfg

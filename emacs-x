@@ -1,0 +1,53 @@
+#!/bin/bash
+# This script is to be used with emacs running as server.
+# If there is a present emacs frame, switch to it, otherwise
+# create a new one. This way, you have only one emacs frame running.
+
+if ! which wmctrl > /dev/null; then
+    echo "Error, you need wmctrl!"
+    exit 1
+fi
+
+# Which emacs binaries to use
+EMACS="emacs"
+EMACS_CLIENT="emacsclient"
+#EMACS="$HOME/.local/bin/emacs"
+#EMACS_CLIENT="$HOME/.local/bin/emacsclient"
+
+THIS_SCRIPT=`basename $0`
+EMACS_RUNNING=0
+EMACS_WINDOW=0
+
+# Check if emacs is running and/or if window is present
+if ps aux | egrep -v "grep|"$THIS_SCRIPT"" | grep emacs &> /dev/null; then
+    EMACS_RUNNING=1
+    if wmctrl -l | grep emacs@$(hostname) &> /dev/null; then
+        EMACS_WINDOW=1
+    fi
+fi
+
+# With no arguments, only present emacs window to user
+if [[ "$#" == 0 ]]; then
+    if [[ $EMACS_WINDOW == 1 ]]; then
+        wmctrl -F -a "emacs@$HOSTNAME"
+    elif [[ $EMACS_RUNNING == 1 ]]; then
+        $EMACS_CLIENT -c
+    else
+        $EMACS &
+    fi
+    exit 0
+fi
+
+# With an argument, pass it on to emacs
+if [[ "$#" -ge 1 ]]; then
+    if [[ "$EMACS_WINDOW" == 1 ]]; then
+        $EMACS_CLIENT -n "$@"
+    elif [[ "$EMACS_RUNNING" == 1 ]]; then
+        $EMACS_CLIENT -c "$@"
+    else
+        $EMACS "$@"
+    fi
+    exit 0
+fi
+
+exit 0

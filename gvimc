@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Connect to the first gvim server found, or start regular gvim
+#NUM_SERVERS=`vim --serverlist | wc -l`
+#if [ $NUM_SERVERS -gt 0 ];
+#then
+    #FIRST_SERVER=`gvim --serverlist | head -1`
+    #gvim --servername $FIRST_SERVER --remote $@
+#else
+    #gvim $@
+#fi
+
+# Connect to graphical vim server
+GVIM_SERVER_NAME="GVIM"
+GVIM_SERVER_INSTANCE=`vim --serverlist | grep $GVIM_SERVER_NAME`
+if [[ $GVIM_SERVER_INSTANCE != "" ]];
+then
+    gvim --servername $GVIM_SERVER_NAME --remote "$@"
+else
+    gvim --servername $GVIM_SERVER_NAME "$@"
+fi

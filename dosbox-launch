@@ -1,0 +1,20 @@
+#!/bin/bash
+#------------------------------
+# A helper script for launching apps with dosbox, by moljac024
+#------------------------------
+# Configuration:
+DOSBOX_CONF_FILE="$HOME/.config/dosbox/dosbox.conf"
+DOSBOX_CONF_DIR="$HOME/.config/dosbox"
+#------------------------------
+
+if [[ "$#" -lt "1" ]]; then
+    dosbox -conf "$DOSBOX_CONF_FILE" &
+else
+    if [[ -f "$DOSBOX_CONF_DIR"/"$1" ]]; then
+       dosbox -conf "$DOSBOX_CONF_DIR"/"$1" &
+    elif [[ -f "$DOSBOX_CONF_DIR"/"$1.conf" ]]; then
+       dosbox -conf "$DOSBOX_CONF_DIR"/"$1.conf" &
+    else
+       dosbox -conf "$DOSBOX_CONF_FILE" &
+    fi
+fi

@@ -1,0 +1,34 @@
+#!/bin/bash
+
+SECS="1"            # sleep $SECS
+BG="#8E35EF"        # background colour of window
+FG="#FFFF00"        # foreground colour of text/icon
+BAR_FG="#F52887"    # foreground colour of volume bar
+BAR_BG="#41A317"    # background colour of volume bar
+XPOS="705"          # horizontal positioning
+YPOS="800"          # vertical positioning
+HEIGHT="30"         # window height
+WIDTH="250"         # window width
+BAR_WIDTH="150"     # width of volume bar
+ICON=~/.pulse/dzen_icons/vol-hi.xbm
+FONT="-*-terminus-medium-r-*-*-14-*-*-*-*-*-*-*"
+ICON_VOL=~/.pulse/dzen_icons/vol-hi.xbm
+ICON_VOL_MUTE=~/.pulse/dzen_icons/vol-mute.xbm
+ICON=$ICON_VOL
+
+function set_volume() {
+    CURVOL=$1
+    pactl set-sink-volume 0 $CURVOL
+}
+
+# Get current volume. return a %
+function get_volume() {
+    MIXER=$(pacmd list-sinks 0 | grep -i "volume: 0:")
+    echo $MIXER | cut -d ' ' -f 3 | cut -d '%' -f 1
+}
+# For the real volume, you have to * 65536 / 100
+VOL=$(get_volume)
+CURVOL=$[$VOL * 65536 / 100]
+
+echo $VOL
+echo $CURVOL

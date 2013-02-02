@@ -1,0 +1,14 @@
+#!/bin/bash
+#------------------------------
+# A script for shutting down the pc after all downloads are finished
+#------------------------------
+
+THIS_SCRIPT=`basename $0`
+while true; do
+    if ps aux | egrep -v "grep|"$THIS_SCRIPT"" | grep "wget" > /dev/null; then
+        sleep 1m
+    else
+        sudo /sbin/shutdown -h now
+    fi
+done
+exit

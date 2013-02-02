@@ -1,0 +1,125 @@
+#!/bin/bash
+#------------------------------
+# A script for rotating the wallpaper, by moljac024
+#------------------------------
+# Configuration:
+# Lock file
+LOCK_FILE=$HOME/.bashwall-rotate
+#------------------------------
+
+setWallpaper ()
+{
+    bashwall -ua
+    while true; do
+        case "$1" in
+            1)
+                bashwall -ss
+                ;;
+            2)
+                bashwall -sr
+                ;;
+            *)
+                echo "Error, you fsced up the script!"
+                exit 1
+                ;;
+        esac
+        if [[ "$?" != "0" ]]; then
+            echo "Couldn't set wallpaper, aborting!"
+            rm -f "${LOCK_FILE}"
+            exit 1
+        fi
+        sleep "$2"m;
+    done
+}
+
+# Check command line argument and start rotating
+
+check ()
+{
+    if $(echo ""$1"" | grep [^0-9] &>/dev/null); then
+        echo "Specified argument for minutes is not a number!"
+        exit 1
+    fi
+
+    if [[ "$1" == "0" ]]; then
+        if [ -f "${LOCK_FILE}" ]; then
+            myPID=`head -n 1 "${LOCK_FILE}"`
+            testRunning=`ps -p ${myPID} | grep ${myPID}`
+            if [ -z "${testRunning}" ]; then
+                echo "Rotation isn't in progress!"
+                rm -f "${LOCK_FILE}"
+                exit 0
+            else
+                kill "$myPID"
+                echo "Rotation stopped!"
+                rm -f "${LOCK_FILE}"
+                exit 0
+            fi
+        else
+            echo "Rotation isn't in progress!"
+            exit 0
+        fi
+    fi
+}
+
+rotate ()
+{
+    # Is rotation already in progress ?
+    if [ -f "${LOCK_FILE}" ]; then
+
+        # The file exists so read the PID
+        # to see if it is still running
+        myPID=`head -n 1 "${LOCK_FILE}"`
+        testRunning=`ps -p ${myPID} | grep ${myPID}`
+
+        if [ -z "${testRunning}" ]; then
+            # The process is not running
+            # Echo current PID into lock file
+            echo "Starting wallpaper rotation.."
+            echo $$ > "${LOCK_FILE}"
+        else
+            echo "Restarting wallpaper rotation.."
+            kill "$myPID"
+            echo $$ > "${LOCK_FILE}"
+        fi
+    else
+        echo "Starting wallpaper rotation.."
+        echo $$ > "${LOCK_FILE}"
+    fi
+}
+
+printUsage ()
+{
+    #rm -f "${LOCK_FILE}"
+    echo -e "Invalid command line argument(s)!\nUsage:\n"
+    echo -e "`basename "$0"` [options] [minutes]\n"
+    echo -e "Options:\n"
+    echo -e "-s \tSequencal wallpaper rotation"
+    echo -e "-r \tRandom wallpaper rotation"
+    echo -e "\nMinutes:\n"
+    echo -e "n  \tInteger, specifies the interval at which the wallpaper changes"
+    echo -e "0  \tIf 0 is provided, rotation will be stopped (if active)"
+    exit 1
+}
+
+if [ "$#" == "2" ]; then
+    case "$1" in
+        "-s")
+            check "$2"
+            rotate
+            setWallpaper 1 "$2"
+            exit 0
+            ;;
+        "-r")
+            check "$2"
+            rotate
+            setWallpaper 2 "$2"
+            exit 0
+            ;;
+        *)
+            printUsage
+            ;;
+    esac
+else
+    printUsage
+fi

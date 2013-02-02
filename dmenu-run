@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Default:
+#dmenu_run -i -p "Run:" &
+
+# Ubuntu colors:
+# dmenu_run -i -p "Run:" -nb '#3c3637' -nf '#e5e5e5' -sb '#e96e3b' -sf '#e5e5e5' &
+
+# Zenburn colors:
+dmenu_run -i -p "Run:" -nb '#3f3f3f' -nf '#e5e5e5' -sb '#7f9f7f' -sf '#e5e5e5' &
+
+exit

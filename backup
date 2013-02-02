@@ -1,0 +1,98 @@
+#!/bin/bash
+#------------------------------
+# This script makes a backup of various configuration files, by moljac024
+#------------------------------
+# Configuration:
+backupDir="/mnt/data/Backup/"
+#------------------------------
+
+# set -o nounset
+
+if [[ $EUID = 0 ]]; then
+    echo "Ooops, you're running this as root! You better not!"
+    exit 1
+fi
+
+backupConfigs () {
+    echo "Backing up configs.."
+    cd "$HOME"
+    tar -czf "$backupDir"/Configs.tar.gz \
+        .bashrc .bash.mine .bash.root \
+        .tmux.conf .mpdconf \
+        .rtorrent.rc .dosbox/ \
+        .conkyrc .nethackrc .ssh/ \
+        .weechat/ .wine/ .wine-bottles/ \
+        .xmodmap .xmonad/ \
+        .config/conky/ .config/Terminal/ \
+        .config/awesome/ .config/openbox/ \
+        &> /dev/null
+}
+
+backupNotes () {
+    echo "Backing up notes.."
+    cd $HOME
+    tar -czf "$backupDir"/Notes.tar.gz \
+        .emacs.d/org/ \
+        .vim/notes/ \
+        &> /dev/null
+}
+
+backupTemplates () {
+    echo "Backing up template files.."
+    cd $HOME
+    tar -czf "$backupDir"/Templates.tar.gz \
+        Templates/ \
+        &> /dev/null
+}
+
+backupEmacs () {
+    echo "Backing up emacs.."
+    cd $HOME
+    tar -czf "$backupDir"/Emacs.tar.gz \
+        .emacs.d/ \
+        &> /dev/null
+}
+
+backupVim () {
+    echo "Backing up vim.."
+    cd $HOME
+    tar -czf "$backupDir"/Vim.tar.gz \
+        .vimrc .vim/ \
+        &> /dev/null
+}
+
+backupScripts () {
+    echo "Backing up scripts.."
+    cd $HOME
+    tar -czf "$backupDir"/Scripts.tar.gz \
+        bin/ \
+        &> /dev/null
+}
+
+backupThemes () {
+    echo "Backing up themes.."
+    cd $HOME
+    tar -czf "$backupDir"/Themes.tar.gz \
+        .icons/ .themes/ .fonts/ \
+        &> /dev/null
+}
+
+backupDevelopment () {
+    echo "Backing up dev files.."
+    cd "$HOME"
+    tar -czf "$backupDir"/Development.tar.gz \
+        Development/ \
+        &> /dev/null
+}
+
+backupConfigs
+backupTemplates
+backupNotes
+backupScripts
+backupVim
+if [[ "$1" != "--min" ]]; then
+    backupEmacs
+    backupDevelopment
+    backupThemes
+fi
+exit 0

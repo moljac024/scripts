@@ -1,0 +1,35 @@
+#!/bin/bash
+#------------------------------
+# A timer script, by moljac024
+#------------------------------
+# Configuration:
+
+# Alarm sound
+SOUND_FILE=$HOME/.timer/alert.ogg
+
+# Alarm text
+ALARM_TEXT="Your time is up!"
+#------------------------------
+
+# Check command line argument and start timer
+if [ "$#" != "1" ]; then
+    echo -e "Invalid command line argument(s), must supply one integer argument!\n"
+    echo -e "If argument is 0 the timer stops, otherwise it resets with the provided argument"
+    exit 1
+fi
+
+if $(echo ""$1"" | grep [^0-9] &>/dev/null); then
+    echo "Specified argument is not a number!"
+    exit 1
+fi
+	
+sleep "$1"m
+aplay "$SOUND_FILE" &
+zenity --title="Alarm" --warning --text="$ALARM_TEXT"
+if [[ "$?" != "0" ]]; then
+    echo "Error running the alarm command!"
+    rm -f "${LOCK_FILE}"
+    exit 1
+fi
+    rm -f "${LOCK_FILE}"
+exit 0

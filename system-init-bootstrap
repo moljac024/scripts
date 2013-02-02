@@ -1,0 +1,23 @@
+#!/bin/bash
+#------------------------------
+# X system bootstrapper
+#------------------------------
+
+# Set up the monitors
+system-setup-xrandr
+
+# Restore wallpaper
+if [ "$1" -e "--with-wallpaper" ]; then
+    nitrogen --restore
+fi
+
+# Init environment
+system-setup-xorg
+system-setup-keyboard
+system-setup-mouse
+
+# Start the applications
+system-start-applications
+
+# Please ubuntu, let me keep my sanity
+#eval $(gnome-keyring-daemon --start)

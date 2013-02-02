@@ -1,0 +1,50 @@
+#!/bin/bash
+#------------------------------
+# A script for a shutdown or reboot prompt, by moljac024
+#------------------------------
+
+if [ "$#" -ge 1 ]; then
+    ACTION=$1
+else
+    ACTION="shutdown"
+fi
+
+if [ "$#" -gt 1 ]; then
+    if ! $(echo ""$2"" | grep [^0-9] &>/dev/null); then
+        i=$2
+        while true; do
+            echo "$ACTION" in $i minutes..
+            sleep 1m
+            let i=$i-1
+            if (( $i == 0 )); then break; fi
+        done
+    fi
+fi
+
+if [[ "$2" == "gui" ]]; then
+    command -v zenity >/dev/null 2>&1 || exit 1
+    if ! zenity --title "Log out" --question --text "Are you sure you want to "$ACTION"?"; then
+        exit 0
+    fi
+else
+    echo "$ACTION" now!
+fi
+
+case "$ACTION" in
+    "shutdown")
+        dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Stop
+        ;;
+    "reboot" | "restart")
+        dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart
+        ;;
+    "hibernate")
+        dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Hibernate
+        ;;
+    "suspend")
+        dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Suspend
+        ;;
+    *)
+        echo "uknown operation: $ACTION"
+        exit 1
+        ;;
+esac

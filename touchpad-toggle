@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Get current state of touchpad
+STATE=$(synclient -l | grep TouchpadOff | sed -e "s/^.*\(.\)$/\1/")
+
+if [[ $STATE == 0 ]]; then
+    synclient TouchpadOff=1
+    notify-send "Touchpad OFF"
+elif [[ $STATE == 1 ]]; then
+    synclient TouchpadOff=0
+    notify-send "Touchpad ON"
+fi
+
+exit 0

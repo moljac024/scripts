@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if ! which wmctrl > /dev/null; then
+    echo "error: wmctrl not found"
+    exit 1
+fi
+
+if ! wmctrl -a "Terminal"; then
+    xfce4-terminal --geometry=80x25 -x tmux -2 attach-session -t Executor &
+fi

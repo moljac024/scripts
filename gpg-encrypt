@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [[ "$#" != "1" ]]; then
+    echo "Must provide only one argument!"
+elif [[ -f "$1" && -w "$1"  ]]; then
+    gpg -c --cipher-algo AES "$1" && shred --remove --zero "$1"
+else
+    echo ""$1" is not a file, or no write permission!"
+fi

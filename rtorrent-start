@@ -1,0 +1,23 @@
+#!/bin/bash
+#------------------------------
+# A script for starting rtorrent
+# Configuration:
+#------------------------------
+# The location of the rtorrent lock file
+LOCK_FILE=$HOME/Downloads/Torrents/rtorrent-session/rtorrent.lock
+#------------------------------
+
+THIS_SCRIPT=`basename $0`
+#if ps aux | egrep -v "grep|"$THIS_SCRIPT"" | grep "$APPS" > /dev/null; then
+if ! pgrep rtorrent > /dev/null; then
+    echo "rtorrent already running!"
+    exit 1
+else
+    if [ -f "$LOCK_FILE" ]; then
+        echo "rtorrent not running, but lock file present!"
+        echo -n "deleting lock file..."
+        rm -f "$LOCK_FILE" && echo "done"
+    fi
+    rtorrent
+    exit 0
+fi

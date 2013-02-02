@@ -1,0 +1,21 @@
+#!/bin/bash
+#------------------------------
+# A helper script for launching applications with wine, by moljac024
+#------------------------------
+# Configuration:
+#------------------------------
+WINEPREFIX_DIR="$HOME/.wine-bottles"
+
+
+if [[ "$#" != 2 ]]; then
+    echo "Provide two options - wine prefix and executable name"
+    exit 1
+fi
+
+if [[ ! -f $2 ]]; then
+    echo "File does not exist"
+    exit 1
+fi
+
+WINEPREFIX="$WINEPREFIX_DIR/$1" wine "$2"
+

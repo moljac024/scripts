@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Bootstrap environment
+system-init-bootstrap
+
+# Start window manager
+xmonad

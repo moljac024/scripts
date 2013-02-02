@@ -1,0 +1,39 @@
+#!/bin/bash
+#--------------------------------
+# A script for starting an application the way you want it, by moljac024
+#--------------------------------
+# Configuration:
+TERMINAL_COMMAND="terminal -e"
+#--------------------------------
+
+if [[ "$#" -lt "3" ]]; then
+    echo "Error, provide 3 arguments minimum!"
+    exit 1
+fi
+
+if [[ "$1" == "-t" ]]; then
+    COMMAND="$TERMINAL_COMMAND $3"
+elif [[ "$1" == "-xmonad" ]]; then
+    COMMAND="gnome-terminal --profile=XMonad -x $3"
+else
+    COMMAND="$3"
+fi
+
+THIS_SCRIPT=`basename $0`
+
+if ps aux | egrep -v "grep|"$THIS_SCRIPT"" | grep $3; then
+    if [[ "$2" == "-k" ]]; then
+        killall "$3"
+        exit 0
+    elif [[ "$2" == "-r" ]]; then
+        killall "$3"
+        exec $COMMAND &> /dev/null
+        exit 0
+    elif [[ "$2" == "-s" ]]; then
+        echo "$3 already running!"
+        exit 1
+    fi
+else
+	exec $COMMAND &> /dev/null
+    exit 0
+fi

@@ -1,0 +1,31 @@
+#!/bin/bash
+#------------------------------
+# A script for automatic starting or attaching to tmux session, by moljac024
+#------------------------------
+# Configuration:
+DEFAULT_SESSION="Executor"
+#------------------------------
+
+#set -o nounset
+
+if [[ "$#" -lt "1" ]]; then
+  #echo "No session name provided, using default.."
+  SESSION="$DEFAULT_SESSION"
+else
+  SESSION="$1"
+fi
+
+# Check if session exists
+#if tmux has-session -t "$SESSION"; then
+#   tmux -2 attach-session -d -t "$SESSION"
+#else
+#   tmux -2 new-session -s "$SESSION"
+#fi
+
+#exit
+
+if [[ $TMUX == "" ]]; then
+tmux attach-session -t "$SESSION"
+else
+echo "Already inside tmux session!"
+fi

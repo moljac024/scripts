@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ -e "$1" ]; then
+  if [ -e "$2" ]; then
+    echo "Both $1 and $2 exist."
+    exit 1
+  else
+    ln -s "$1" "$2"
+  fi
+else
+  if [ -e "$2" ]; then
+    ln -s "$2" "$1"
+  else
+    echo "Neither $1 nor $2 exist"
+    exit 2
+  fi
+fi
+
+exit 0

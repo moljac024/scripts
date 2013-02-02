@@ -1,0 +1,33 @@
+#!/bin/bash
+#------------------------------
+# Configuration:
+DEFAULT_TEMPLATE="'::base.html.twig'"
+DEFAULT_TITLE="Title"
+#------------------------------
+
+# Get arguments
+if [[ $? -gt 1 ]]; then
+    TEMPLATE="'$2'"
+else
+    TEMPLATE=DEFAULT_TEMPLATE
+fi
+
+if [[ $? -gt 2 ]]; then
+    TITLE=$3
+else
+    TITLE=$DEFAULT_TITLE
+fi
+
+TWIG_START="{% extends $TEMPLATE %}
+{% block title %} $TITLE {% endblock %}
+{% block body %}
+"
+TWIG_END="
+{% endblock %}"
+
+if [[ `tail -1 $1` == "{% endblock %}" ]]; then
+    exit
+    #echo "Already twigied boy!"
+else
+    echo "$TWIG_START$(cat $1)$TWIG_END" > $1
+fi
