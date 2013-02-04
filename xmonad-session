@@ -10,7 +10,7 @@ nitrogen --restore
 xfce4-panel &
 
 # Autostart applications
-#system-setup-autostart
+system-setup-autostart
 
 # Start window manager
 exec ~/.cabal/bin/xmonad

@@ -1,0 +1,10 @@
+#!/bin/bash
+#------------------------------
+# X wallpaper setter
+#------------------------------
+# Configuration:
+#------------------------------
+WALLPAPER_DIR=$HOME/Pictures/Wallpapers
+#------------------------------
+
+nitrogen $WALLPAPER_DIR

@@ -3,10 +3,10 @@
 # Common applications starter
 #------------------------------
 
-#pgrep seapplet || seapplet & # SELinux applet
-#pgrep pnmixer || pnmixer & # Sound mixer
-pgrep mpd || mpd & # Music daemon
-pgrep nm-applet || nm-applet & # Network manager
-pgrep transmission || transmission-gtk -m & # Torrent client
-pgrep sonata || sonata --hidden & # Music player
-pgrep pidgin || pidgin & # Chat client
+#[ `pgrep seapplet` ] || seapplet & # SELinux applet
+#[ `pgrep pnmixer` ] || pnmixer & # Sound mixer
+[ `pgrep mpd` ] || mpd & # Music daemon
+[ `pgrep nm-applet ` ] || nm-applet & # Network manager
+[ `pgrep transmission` ] || transmission-gtk -m & # Torrent client
+[ `pgrep sonata` ] || sonata --hidden & # Music player
+[ `pgrep pidgin` ] || pidgin & # Chat client
