@@ -1,12 +1,33 @@
 #!/bin/bash
+#-------------------------
+# Dmenu run launcher, by moljac024
+#-------------------------
+# Configuration:
+#-------------------------
 
-# Default:
-#dmenu_run -i -p "Run:" &
-
-# Ubuntu colors:
-# dmenu_run -i -p "Run:" -nb '#3c3637' -nf '#e5e5e5' -sb '#e96e3b' -sf '#e5e5e5' &
+# Solarized colors:
+NORMAL_BACKGROUND='#fdf6e3'
+NORMAL_FOREGROUND='#657b83'
+SELECTED_BACKGROUND='#eee8d5'
+SELECTED_FOREGROUND='#657b83'
 
 # Zenburn colors:
-dmenu_run -i -p "Run:" -nb '#3f3f3f' -nf '#e5e5e5' -sb '#7f9f7f' -sf '#e5e5e5' &
+#NORMAL_BACKGROUND='#3f3f3f'
+#NORMAL_FOREGROUND='#e5e5e5'
+#SELECTED_BACKGROUND='#7f9f7f'
+#SELECTED_FOREGROUND='#e5e5e5'
 
-exit
+# Ubuntu colors:
+#NORMAL_BACKGROUND='#3c3637'
+#NORMAL_FOREGROUND='#e5e5e5'
+#SELECTED_BACKGROUND='#e96e3b'
+#SELECTED_FOREGROUND='#e5e5e5'
+
+# Run dmenu:
+dmenu_run -i -p "Run:" \
+    -nb $NORMAL_BACKGROUND \
+    -nf $NORMAL_FOREGROUND \
+    -sb $SELECTED_BACKGROUND \
+    -sf $SELECTED_FOREGROUND \
+    -fn '-*-*-bold-r-*-*-20-*-*-*-*-*-*-*'
+

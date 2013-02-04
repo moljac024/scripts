@@ -3,7 +3,7 @@
 # A script for taking a screenshot, by moljac024
 #-----------------------
 # Configuration:
-DIRECTORY="/mnt/data/Slike/Screenshots/"
+DIRECTORY="$HOME/Pictures/Screenshots/"
 #-----------------------
 
 set -o nounset

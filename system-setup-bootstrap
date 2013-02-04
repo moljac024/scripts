@@ -1,0 +1,24 @@
+#!/bin/bash
+#------------------------------
+# X system bootstrapper
+#------------------------------
+
+#------------------------------
+# Bootstrap Xorg
+#------------------------------
+
+system-setup-xorg
+
+#------------------------------
+# Restore wallpaper
+#------------------------------
+
+nitrogen --restore
+
+#------------------------------
+# Autostart applications
+#------------------------------
+
+# Please ubuntu, let me keep my sanity
+#eval $(gnome-keyring-daemon --start)
+system-setup-autostart

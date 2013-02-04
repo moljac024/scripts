@@ -612,7 +612,7 @@ printUsage ()
     -u  | --update          Update (or create) the lists
     -ua | --update-all      Update (or create) the lists, but don't skip any folders
     -r  | --restore         Restore the previously set wallpaper
-    EOF
+EOF
     exit 1
 }
 

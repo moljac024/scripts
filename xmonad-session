@@ -1,7 +1,16 @@
 #!/bin/sh
 
 # Bootstrap environment
-system-init-bootstrap
+system-setup-xorg
+
+# Restore wallpaper
+nitrogen --restore
+
+# Start panel (for the tray)
+xfce4-panel &
+
+# Autostart applications
+#system-setup-autostart
 
 # Start window manager
-xmonad
+exec ~/.cabal/bin/xmonad

@@ -28,6 +28,14 @@ backupConfigs () {
         &> /dev/null
 }
 
+backupScripts () {
+    echo "Backing up scripts.."
+    cd $HOME
+    tar -czf "$backupDir"/Scripts.tar.gz \
+        bin/ \
+        &> /dev/null
+}
+
 backupNotes () {
     echo "Backing up notes.."
     cd $HOME
@@ -45,11 +53,19 @@ backupTemplates () {
         &> /dev/null
 }
 
-backupEmacs () {
-    echo "Backing up emacs.."
+backupThemes () {
+    echo "Backing up themes.."
     cd $HOME
-    tar -czf "$backupDir"/Emacs.tar.gz \
-        .emacs.d/ \
+    tar -czf "$backupDir"/Themes.tar.gz \
+        .icons/ .themes/ \
+        &> /dev/null
+}
+
+backupFonts () {
+    echo "Backing up fonts.."
+    cd $HOME
+    tar -czf "$backupDir"/Fonts.tar.gz \
+        .fonts/ \
         &> /dev/null
 }
 
@@ -61,19 +77,11 @@ backupVim () {
         &> /dev/null
 }
 
-backupScripts () {
-    echo "Backing up scripts.."
+backupEmacs () {
+    echo "Backing up emacs.."
     cd $HOME
-    tar -czf "$backupDir"/Scripts.tar.gz \
-        bin/ \
-        &> /dev/null
-}
-
-backupThemes () {
-    echo "Backing up themes.."
-    cd $HOME
-    tar -czf "$backupDir"/Themes.tar.gz \
-        .icons/ .themes/ .fonts/ \
+    tar -czf "$backupDir"/Emacs.tar.gz \
+        .emacs.d/ \
         &> /dev/null
 }
 
@@ -86,13 +94,14 @@ backupDevelopment () {
 }
 
 backupConfigs
-backupTemplates
-backupNotes
 backupScripts
+backupNotes
+backupTemplates
 backupVim
 if [[ "$1" != "--min" ]]; then
     backupEmacs
     backupDevelopment
     backupThemes
+    backupFonts
 fi
 exit 0

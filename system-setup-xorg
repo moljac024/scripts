@@ -3,6 +3,22 @@
 # Xorg setup
 #------------------------------
 
+#------------------------------
+# Xranrd initialization
+#------------------------------
+
+#xrandr --output LVDS1 --auto
+
+if xrandr -q | grep "VGA1 disconnected" >/dev/null; then
+    xrandr --output VGA1 --off
+elif xrandr -q | grep "VGA1 connected" >/dev/null; then
+    xrandr --output VGA1 --auto --below LVDS1
+fi
+
+#------------------------------
+# Xorg server setup
+#------------------------------
+
 # Run xrdb if necessary
 if [ -f ~/.Xdefaults ]; then
     xrdb -merge .Xdefaults
@@ -12,3 +28,42 @@ fi
 
 # DPMS timeout
 #xset dpms 300 600 900
+
+#------------------------------
+# Xorg keyboard setup
+#------------------------------
+
+# Run xmodmap if neccesarry
+# if [ -f ~/.Xmodmap ]; then
+#     xmodmap ~/.Xmodmap
+# elif [ -f ~/.xmodmap ]; then
+#     xmodmap ~/.xmodmap
+# fi
+
+# Repeat delay and rate
+xset r rate 500 20
+
+# Make caps lock additional control
+setxkbmap -option "ctrl:nocaps"
+
+# Set up keyboard layout switching
+setxkbmap -layout us,rs -variant ,latinyz
+setxkbmap -option "grp:alt_shift_toggle"
+
+# Turn on numlock
+command -v numlockx >/dev/null 2>&1 && numlockx &
+
+#------------------------------
+# Xorg mouse setup
+#------------------------------
+
+# Sane mouse acceleration
+xset m 1 4
+
+# Set up touchpad for tapping
+if command -v synclient >/dev/null 2>&1; then
+    synclient TapButton1=1
+    synclient TapButton2=3
+    synclient TapButton3=2
+    synclient VertEdgeScroll=1
+fi
