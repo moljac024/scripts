@@ -97,11 +97,11 @@ backupConfigs
 backupScripts
 backupNotes
 backupTemplates
-backupVim
+backupThemes
+backupFonts
 if [[ "$1" != "--min" ]]; then
+    backupVim
     backupEmacs
     backupDevelopment
-    backupThemes
-    backupFonts
 fi
 exit 0
