@@ -21,9 +21,11 @@ fi
 
 # Run xrdb if necessary
 if [ -f ~/.Xdefaults ]; then
-    xrdb -merge .Xdefaults
-elif [ -f ~/.Xresources ]; then
-    xrdb -merge .Xresources
+    xrdb .Xdefaults
+fi
+
+if [ -f ~/.Xresources ]; then
+    xrdb .Xresources
 fi
 
 # DPMS timeout

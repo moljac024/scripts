@@ -17,12 +17,12 @@ backupConfigs () {
     echo "Backing up configs.."
     cd "$HOME"
     tar -czf "$backupDir"/Configs.tar.gz \
-        .bashrc .bash.mine .bash.root \
+        .bashrc .bash.mine \
         .tmux.conf .mpdconf \
         .rtorrent.rc .dosbox/ \
-        .conkyrc .nethackrc .ssh/ \
+        .conkyrc .ssh/ \
         .weechat/ .wine/ .wine-bottles/ \
-        .xmodmap .xmonad/ \
+        .Xresources .xmodmap .xmonad/ \
         .config/conky/ .config/Terminal/ \
         .config/awesome/ .config/openbox/ \
         &> /dev/null

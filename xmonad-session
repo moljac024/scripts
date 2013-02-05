@@ -6,6 +6,9 @@ system-setup-xorg
 # Restore wallpaper
 nitrogen --restore
 
+# Start urxvt daemon
+#urxvtd &
+
 # Start panel (for the tray)
 xfce4-panel &
 
