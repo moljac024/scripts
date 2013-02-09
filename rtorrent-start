@@ -4,7 +4,7 @@
 # Configuration:
 #------------------------------
 # The location of the rtorrent lock file
-LOCK_FILE=$HOME/Downloads/Torrents/rtorrent-session/rtorrent.lock
+LOCK_FILE=$HOME/Downloads/Torrents/.session/rtorrent.lock
 #------------------------------
 
 THIS_SCRIPT=`basename $0`

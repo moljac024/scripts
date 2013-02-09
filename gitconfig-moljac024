@@ -1,0 +1,4 @@
+#!/bin/bash
+
+git config --global user.name moljac024
+git config --global user.email matic.bojan@gmail.com
