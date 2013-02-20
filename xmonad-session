@@ -1,10 +1,13 @@
 #!/bin/sh
 
+# Set up monitors
+system-setup-monitors
+
 # Bootstrap environment
 system-setup-xorg
 
 # Restore wallpaper
-nitrogen --restore
+restore-wallpaper
 
 # Thunar daemon
 #thunar --daemon &

@@ -23,8 +23,8 @@ resHeight=800
 
 # What to use as wallpaper setting back-end (possible values: auto, feh, nitrogen, xfce, gnome)
 #wpCommand="auto"
-# wpCommand="feh"
-wpCommand="nitrogen"
+wpCommand="feh"
+#wpCommand="nitrogen"
 #wpCommand="xfce"
 #wpCommand="gnome"
 

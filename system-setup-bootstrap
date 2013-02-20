@@ -4,7 +4,13 @@
 #------------------------------
 
 #------------------------------
-# Bootstrap Xorg
+# Set up monitors
+#------------------------------
+
+system-setup-monitors
+
+#------------------------------
+# Setup Xorg
 #------------------------------
 
 system-setup-xorg
@@ -13,7 +19,7 @@ system-setup-xorg
 # Restore wallpaper
 #------------------------------
 
-nitrogen --restore
+restore-wallpaper
 
 #------------------------------
 # Autostart applications
@@ -21,4 +27,5 @@ nitrogen --restore
 
 # Please ubuntu, let me keep my sanity
 #eval $(gnome-keyring-daemon --start)
+
 system-setup-autostart
