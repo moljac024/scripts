@@ -1,0 +1,10 @@
+#!/bin/bash
+#------------------------------
+# A script for opening a file manager the smart way
+#------------------------------
+# Configuration:
+#------------------------------
+DEFAULT_FM="nemo --no-desktop"
+#-------------------------------
+
+$DEFAULT_FM

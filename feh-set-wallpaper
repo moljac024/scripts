@@ -1,0 +1,10 @@
+#!/bin/bash
+#------------------------------
+# Set wallpaper with feh
+#------------------------------
+# Configuration:
+#------------------------------
+WALLPAPER_DIR=$HOME/Pictures/Wallpapers
+#------------------------------
+
+feh --bg-fill "$@"

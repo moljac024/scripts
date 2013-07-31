@@ -6,5 +6,6 @@ if ! which wmctrl > /dev/null; then
 fi
 
 if ! wmctrl -a "Terminal"; then
+    #TERM=screen-256color-bce xfce4-terminal --geometry=80x25 -x tmux -2 attach-session -t Executor &
     xfce4-terminal --geometry=80x25 -x tmux -2 attach-session -t Executor &
 fi

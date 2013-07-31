@@ -5,14 +5,14 @@
 # Configuration:
 #-----------------------
 #DZEN_FONT="-*-terminus-*-*-*-*-14-*-*-*-*-*-*-*"
-DZEN_FONT="-*-*-bold-r-*-*-20-*-*-*-*-*-*-*"
+DZEN_FONT="-*-*-*-r-*-*-20-*-*-*-*-*-*-*"
 DZEN_BG="#494949"
 DZEN_FG="#ffffff"
 DZEN_WIDTH=400
 DZEN_HEIGHT=32
 DZEN_DURATION=5
-DZEN_X_POS=0
-DZEN_Y_POS=0
+DZEN_X_POS=965
+DZEN_Y_POS=28
 #-----------------------
 
 MESSAGE="Testing, testing...you forgot to pass a message didn't you?"

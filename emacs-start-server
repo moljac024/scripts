@@ -1,0 +1,33 @@
+#!/bin/bash
+#------------------------------
+# Start emacs server
+#------------------------------
+
+if ! command -v emacs >/dev/null 2>&1; then
+    echo "no emacs found"
+    exit 1
+fi
+
+if pgrep -x emacs >/dev/null 2>&1; then
+    echo "emacs already running"
+    exit 1
+fi
+
+# Run xrdb if necessary
+if [ -f ~/.Xdefaults ]; then
+    xrdb ~/.Xdefaults
+fi
+
+if [ -f ~/.Xresources ]; then
+    xrdb ~/.Xresources
+fi
+
+# Beware of aliases and custom scripts shadowing system installed
+# emacs
+if [[ -x "/usr/local/bin/emacs" ]]; then
+    /usr/local/bin/emacs --daemon
+elif [[ -x "/usr/bin/emacs" ]]; then
+    /usr/bin/emacs --daemon
+else
+    emacs --daemon
+fi

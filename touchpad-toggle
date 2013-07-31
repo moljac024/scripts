@@ -5,10 +5,10 @@ STATE=$(synclient -l | grep TouchpadOff | sed -e "s/^.*\(.\)$/\1/")
 
 if [[ $STATE == 0 ]]; then
     synclient TouchpadOff=1
-    notify-send "Touchpad OFF"
+    dzen-msg "Touchpad Off"
 elif [[ $STATE == 1 ]]; then
     synclient TouchpadOff=0
-    notify-send "Touchpad ON"
+    dzen-msg "Touchpad On"
 fi
 
 exit 0

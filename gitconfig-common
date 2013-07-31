@@ -1,0 +1,19 @@
+#!/bin/bash
+#----------
+# Common git configuration
+
+git config --global diff.tool ediff
+git config --global difftool.prompt false
+git config --global alias.d difftool
+
+# set default so that you avoid unnecessary commits
+# don't auto-merge with pull
+git config --global branch.autosetuprebase always
+
+# git colors
+git config --global color.ui true
+git config --global color.status auto
+git config --global color.branch auto
+
+# setup default editor
+git config --global core.editor emacs

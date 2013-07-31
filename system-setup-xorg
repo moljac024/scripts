@@ -4,16 +4,26 @@
 #------------------------------
 
 #------------------------------
+# Xrandr setup
+#------------------------------
+
+# Internal laptop monitor
+xrandr --output LVDS1 --auto
+
+# External monitor
+xrandr --output VGA1 --auto --below LVDS1
+
+#------------------------------
 # Xorg server setup
 #------------------------------
 
 # Run xrdb if necessary
 if [ -f ~/.Xdefaults ]; then
-    xrdb .Xdefaults
+    xrdb ~/.Xdefaults
 fi
 
 if [ -f ~/.Xresources ]; then
-    xrdb .Xresources
+    xrdb ~/.Xresources
 fi
 
 # DPMS timeout
@@ -24,9 +34,7 @@ fi
 #------------------------------
 
 # Run xmodmap if neccesarry
-# if [ -f ~/.Xmodmap ]; then
-#     xmodmap ~/.Xmodmap
-# elif [ -f ~/.xmodmap ]; then
+# if [ -f ~/.xmodmap ]; then
 #     xmodmap ~/.xmodmap
 # fi
 

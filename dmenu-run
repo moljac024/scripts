@@ -29,5 +29,5 @@ dmenu_run -i -p "Run:" \
     -nf $NORMAL_FOREGROUND \
     -sb $SELECTED_BACKGROUND \
     -sf $SELECTED_FOREGROUND \
-    -fn '-*-*-bold-r-*-*-20-*-*-*-*-*-*-*'
+    -fn '-*-*-*-r-*-*-20-*-*-*-*-*-*-*'
 

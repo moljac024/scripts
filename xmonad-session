@@ -1,13 +1,13 @@
 #!/bin/sh
 
-# Set up monitors
-system-setup-monitors
-
 # Bootstrap environment
 system-setup-xorg
 
 # Restore wallpaper
 restore-wallpaper
+
+# Emacs!
+emacs-start-server
 
 # Thunar daemon
 #thunar --daemon &

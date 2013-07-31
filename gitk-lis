@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd $HOME/dev/lis
+gitk --all
+
+exit 0

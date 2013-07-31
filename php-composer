@@ -14,19 +14,24 @@ if [[ "$?" != "0" ]]; then
     exit 1
 fi
 
-# while [[ ! (-f ./composer.json) ]]; do
-#     cd ..
-#     if [[ $PWD == "/" ]]; then
-#         echo "error: no php project found"
-#         exit
-#     fi
-# done
-
 # If composer not present, download it, otherwise update
 if [[ ! -f ./composer.phar ]]; then
     curl -s https://getcomposer.org/installer | php
 else
     php ./composer.phar self-update
+fi
+
+# Clean up those .git directories
+if [[ "$@" == "cleanup" ]]; then
+    while [[ ! (-d ./vendor) ]]; do
+        cd ..
+        if [[ $PWD == "/" ]]; then
+            echo "error: no vendor directory found"
+            exit
+        fi
+    done
+    # find ./vendor -name ".git" -exec rm -rf {} \;
+    rm -rf `find ./vendor -type d -name .git`
 fi
 
 if [[ "$@" != "self-update" ]]; then

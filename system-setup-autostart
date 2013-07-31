@@ -3,10 +3,32 @@
 # Common applications starter
 #------------------------------
 
-#[ `pgrep seapplet` ] || seapplet & # SELinux applet
-#[ `pgrep pnmixer` ] || pnmixer & # Sound mixer
-[ `pgrep mpd` ] || mpd & # Music daemon
-[ `pgrep nm-applet ` ] || nm-applet & # Network manager
-[ `pgrep transmission` ] || transmission-gtk -m & # Torrent client
-[ `pgrep sonata` ] || sonata --hidden & # Music player
-[ `pgrep pidgin` ] || pidgin & # Chat client
+# Start emacs server
+emacs-start-server
+
+# SELinux applet
+#[ `pgrep seapplet` ] || seapplet &
+
+# Sound mixer
+#[ `pgrep pnmixer` ] || pnmixer &
+
+# Command launcher
+[ `pgrep synapse` ] || synapse -s &
+
+# Command launcher
+#[ `pgrep kupfer` ] || kupfer &
+
+# Music daemon
+[ `pgrep mpd` ] || mpd &
+
+# Network manager
+[ `pgrep nm-applet ` ] || nm-applet &
+
+# Torrent client
+#[ `pgrep transmission` ] || transmission-gtk -m &
+
+# Music player
+[ `pgrep sonata` ] || sonata --hidden &
+
+# Chat client
+[ `pgrep pidgin` ] || pidgin &

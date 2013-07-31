@@ -1,0 +1,44 @@
+#!/bin/bash
+#---------------------
+# Basher - easier bashing
+#---------------------
+
+include () {
+    [[ -f "$1" ]] && source "$1"
+}
+
+is_avaliable () {
+    if [[ $# < 1 ]]; then
+        return 1
+    fi
+
+    if command -v $1 >/dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+is_running () {
+    if [[ $# < 1 ]]; then
+        return 1
+    fi
+
+    if pgrep "$@" >/dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+is_number () {
+    if [[ $# < 1 ]]; then
+        return 1
+    fi
+
+    if $(echo ""$1"" | grep [^0-9] &>/dev/null); then
+        return 1
+    else
+        return 0
+    fi
+}

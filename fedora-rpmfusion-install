@@ -1,0 +1,5 @@
+#!/bin/bash
+# Enable rpmfusion free and nonfree
+
+# Fedora 14 and up
+su -c 'yum localinstall --nogpgcheck http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm'

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd $HOME/dev/pyro
+gitk --all
+
+exit 0
