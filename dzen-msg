@@ -6,7 +6,8 @@
 #-----------------------
 #DZEN_FONT="-*-terminus-*-*-*-*-14-*-*-*-*-*-*-*"
 DZEN_FONT="-*-*-*-r-*-*-20-*-*-*-*-*-*-*"
-DZEN_BG="#494949"
+#DZEN_BG="#494949"
+DZEN_BG="#000000"
 DZEN_FG="#ffffff"
 DZEN_WIDTH=400
 DZEN_HEIGHT=32
