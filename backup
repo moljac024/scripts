@@ -20,7 +20,7 @@ backupConfigs () {
         .bashrc .bash.mine \
         .tmux.conf .mpdconf \
         .rtorrent.rc .dosbox/ \
-        .conkyrc .ssh/ \
+        .conkyrc .ssh/ .i3/ \
         .weechat/ .wine/ .wine-bottles/ \
         .Xresources .xmodmap .xmonad/ \
         .config/conky/ .config/Terminal/ \
