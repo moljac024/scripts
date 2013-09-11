@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd $HOME/dev/lis/pyro
+cd $HOME/dev/web/sam
 gitk --all
 
 exit 0

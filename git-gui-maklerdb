@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd $HOME/dev/maklerdb
+git gui
+
+exit 0

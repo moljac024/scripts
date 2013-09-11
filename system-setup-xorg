@@ -45,7 +45,7 @@ xset r rate 500 20
 setxkbmap -option "ctrl:nocaps"
 
 # Set up keyboard layout switching
-setxkbmap -layout us,rs -variant ,latinyz
+setxkbmap -layout us,rs,rs -variant ,latinyz,
 setxkbmap -option "grp:alt_shift_toggle"
 
 # Turn on numlock

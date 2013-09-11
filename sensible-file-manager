@@ -4,7 +4,10 @@
 #------------------------------
 # Configuration:
 #------------------------------
-DEFAULT_FM="nemo --no-desktop"
+thunar_command="thunar"
+nautilus_command="nautilus --no-desktop"
+
+default_fm=$nautilus_command
 #-------------------------------
 
-$DEFAULT_FM
+$default_fm

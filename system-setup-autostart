@@ -3,6 +3,9 @@
 # Common applications starter
 #------------------------------
 
+# Shut up...BITCH!
+unset GNOME_KEYRING_CONTROL
+
 # Start emacs server
 emacs-start-server
 
@@ -11,6 +14,14 @@ emacs-start-server
 
 # Sound mixer
 #[ `pgrep pnmixer` ] || pnmixer &
+
+pa="$HOME/.local/bin/pa-applet"
+if [[ -f $pa ]]; then
+    [ `pgrep pa-applet` ] || $pa &
+fi
+
+# Power manager
+[ `pgrep xfce4-power-manager` ] || xfce4-power-manager &
 
 # Command launcher
 [ `pgrep synapse` ] || synapse -s &

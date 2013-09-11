@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd $HOME/dev/lis/pyro
+cd $HOME/dev/maklerdb
 gitk --all
 
 exit 0

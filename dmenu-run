@@ -5,23 +5,46 @@
 # Configuration:
 #-------------------------
 
-# Solarized colors:
-NORMAL_BACKGROUND='#fdf6e3'
-NORMAL_FOREGROUND='#657b83'
-SELECTED_BACKGROUND='#eee8d5'
-SELECTED_FOREGROUND='#657b83'
+if [[ "$#" > 0 ]]; then
+    THEME="$1"
+else
+    echo 'waaa'
+    THEME="default"
+fi
 
-# Zenburn colors:
-#NORMAL_BACKGROUND='#3f3f3f'
-#NORMAL_FOREGROUND='#e5e5e5'
-#SELECTED_BACKGROUND='#7f9f7f'
-#SELECTED_FOREGROUND='#e5e5e5'
-
-# Ubuntu colors:
-#NORMAL_BACKGROUND='#3c3637'
-#NORMAL_FOREGROUND='#e5e5e5'
-#SELECTED_BACKGROUND='#e96e3b'
-#SELECTED_FOREGROUND='#e5e5e5'
+case "$THEME" in
+    "solarized")
+        # Solarized colors:
+        NORMAL_BACKGROUND='#fdf6e3'
+        NORMAL_FOREGROUND='#657b83'
+        SELECTED_BACKGROUND='#eee8d5'
+        SELECTED_FOREGROUND='#657b83'
+        ;;
+    "zenburn")
+        # Zenburn colors:
+        NORMAL_BACKGROUND='#3f3f3f'
+        NORMAL_FOREGROUND='#e5e5e5'
+        SELECTED_BACKGROUND='#7f9f7f'
+        SELECTED_FOREGROUND='#e5e5e5'
+        ;;
+    "ubuntu")
+        # Ubuntu colors:
+        NORMAL_BACKGROUND='#3c3637'
+        NORMAL_FOREGROUND='#e5e5e5'
+        SELECTED_BACKGROUND='#e96e3b'
+        SELECTED_FOREGROUND='#e5e5e5'
+        ;;
+    "default")
+        # Ubuntu colors:
+        NORMAL_BACKGROUND='#000000'
+        NORMAL_FOREGROUND='#e5e5e5'
+        SELECTED_BACKGROUND='#285577'
+        SELECTED_FOREGROUND='#e5e5e5'
+        ;;
+    *)
+        exit 1
+        ;;
+esac
 
 # Run dmenu:
 dmenu_run -i -p "Run:" \
