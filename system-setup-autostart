@@ -3,9 +3,6 @@
 # Common applications starter
 #------------------------------
 
-# Shut up...BITCH!
-unset GNOME_KEYRING_CONTROL
-
 # Start emacs server
 emacs-start-server
 
