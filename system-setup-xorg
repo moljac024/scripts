@@ -65,3 +65,6 @@ if command -v synclient >/dev/null 2>&1; then
     synclient TapButton3=2
     synclient VertEdgeScroll=1
 fi
+
+# Disable tapping initially
+synclient TouchpadOff=2

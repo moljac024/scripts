@@ -3,15 +3,15 @@
 # Get current state of touchpad
 STATE=$(synclient -l | grep TouchpadOff | sed -e "s/^.*\(.\)$/\1/")
 
-if [[ $STATE == 0 || $STATE == 2 ]]; then
-    killall syndaemon
-    synclient TouchpadOff=1
-    dzen-msg "Touchpad Off"
+if [[ $STATE == 0 ]]; then
+    synclient TouchpadOff=2
+    dzen-msg "Touchpad on (no tapping)"
 elif [[ $STATE == 1 ]]; then
     synclient TouchpadOff=0
     dzen-msg "Touchpad On"
-    # Disable touchpad tapping when typing
-    syndaemon -t -k -i 2 -d &
+elif [[ $STATE == 2 ]]; then
+    synclient TouchpadOff=1
+    dzen-msg "Touchpad off"
 else
     dzen-msg "error, unknown STATE: $STATE"
 fi
