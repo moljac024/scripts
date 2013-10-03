@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd $HOME/.emacs.d
+gitk --all
+
+exit 0
