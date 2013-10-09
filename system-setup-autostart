@@ -4,7 +4,7 @@
 #------------------------------
 
 # Start emacs server
-emacs-start-server
+#emacs-start-server
 
 # SELinux applet
 #[ `pgrep seapplet` ] || seapplet &
