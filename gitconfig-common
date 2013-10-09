@@ -1,19 +1,26 @@
 #!/bin/bash
 #----------
-# Common git configuration
 
-git config --global diff.tool ediff
+# Name
+git config --global user.name "Bojan Matić"
+
+# Default editor
+git config --global core.editor vim
+git config --global diff.tool vimdiff
 git config --global difftool.prompt false
-git config --global alias.d difftool
 
-# set default so that you avoid unnecessary commits
-# don't auto-merge with pull
+git config --global alias.d difftool
+git config --global alias.u fetch --all --prune
+git config --global alias.f fetch --all --prune
+git config --global alias.aa add --all
+git config --global alias.br branch
+git config --global alias.co checkout
+git config --global alias.st status
+
+# Don't auto-merge with pull
 git config --global branch.autosetuprebase always
 
-# git colors
+# Colors
 git config --global color.ui true
 git config --global color.status auto
 git config --global color.branch auto
-
-# setup default editor
-git config --global core.editor emacs
