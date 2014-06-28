@@ -3,7 +3,7 @@
 # This script makes a backup of various configuration files, by moljac024
 #------------------------------
 # Configuration:
-backupDir="~/Backup/"
+backupDir="$HOME/Backup"
 #------------------------------
 
 # set -o nounset
@@ -85,11 +85,11 @@ backupEmacs () {
         &> /dev/null
 }
 
-backupDevelopment () {
-    echo "Backing up dev files.."
+backupProjects () {
+    echo "Backing up project files.."
     cd "$HOME"
-    tar -czf "$backupDir"/Development.tar.gz \
-        Development/ \
+    tar -czf "$backupDir"/Projects.tar.gz \
+        Projects/ \
         &> /dev/null
 }
 
