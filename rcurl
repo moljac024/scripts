@@ -1,0 +1,24 @@
+#!/bin/bash
+
+case "$1" in
+    "get" | "GET")
+        METHOD="GET"
+        ;;
+    "put" | "PUT")
+        METHOD="PUT"
+        ;;
+    "post" | "POST")
+        METHOD="POST"
+        ;;
+    "delete" | "DELETE")
+        METHOD="DELETE"
+        ;;
+    *)
+        echo "Must provide valid request method"
+        exit 1
+        ;;
+esac
+
+URL="$2"
+
+curl -i -H "Accept: application/json" -X "$METHOD" "$URL"

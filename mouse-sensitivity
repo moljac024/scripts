@@ -30,11 +30,18 @@ function is_number() {
     fi
 }
 
+function get_decel_prop() {
+    xinput --list-props $1 |
+    grep "Device Accel Constant Deceleration" |
+    cut -c 38-40
+}
+
 mouse_id=$(get_mouse_id)
 is_number=$(is_number $mouse_id)
 
 if [[ $is_number == 'True' ]]; then
-    xinput --set-prop $mouse_id 267 $mouse_sensitivity
+    prop=$(get_decel_prop $mouse_id)
+    xinput --set-prop $mouse_id $prop $mouse_sensitivity
 else
     echo 'Device not found!'
     exit 1

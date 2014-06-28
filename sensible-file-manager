@@ -4,10 +4,13 @@
 #------------------------------
 # Configuration:
 #------------------------------
-thunar_command="thunar"
-nautilus_command="nautilus --no-desktop"
 
-default_fm=$nautilus_command
+# Commands
+thunar="thunar"
+nautilus="nautilus --no-desktop"
+
+# Default
+default_fm=$thunar
 #-------------------------------
 
 $default_fm

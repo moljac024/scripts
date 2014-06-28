@@ -3,7 +3,7 @@
 # This script makes a backup of various configuration files, by moljac024
 #------------------------------
 # Configuration:
-backupDir="/mnt/data/Backup/"
+backupDir="~/Backup/"
 #------------------------------
 
 # set -o nounset

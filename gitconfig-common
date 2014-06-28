@@ -9,15 +9,19 @@ git config --global core.editor vim
 git config --global diff.tool vimdiff
 git config --global difftool.prompt false
 
+git config --global merge.tool vimdiff
+git config --global merge.conflictstyle diff3
+git config --global mergetool.prompt false
+
 git config --global alias.d difftool
-git config --global alias.u fetch --all --prune
-git config --global alias.f fetch --all --prune
-git config --global alias.aa add --all
+git config --global alias.u "fetch --all --prune"
+git config --global alias.f "fetch --all --prune"
+#git config --global alias.aa "add --all"
 git config --global alias.br branch
 git config --global alias.ci commit
 git config --global alias.co checkout
 git config --global alias.st status
-git config --global alias.gg log --all --graph --oneline --decorate --color
+git config --global alias.gg "log --all --graph --oneline --decorate --color"
 
 # Don't auto-merge with pull
 git config --global branch.autosetuprebase always

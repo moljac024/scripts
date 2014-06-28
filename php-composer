@@ -1,5 +1,7 @@
 #!/bin/bash
 
+composer_dir="$HOME/bin"
+
 # Check if curl is installed
 which curl &> /dev/null
 if [[ "$?" != "0" ]]; then
@@ -15,10 +17,10 @@ if [[ "$?" != "0" ]]; then
 fi
 
 # If composer not present, download it, otherwise update
-if [[ ! -f ./composer.phar ]]; then
-    curl -s https://getcomposer.org/installer | php
+if [[ ! -f $composer_dir/composer.phar ]]; then
+    cd $composer_dir && curl -s https://getcomposer.org/installer | php
 else
-    php ./composer.phar self-update
+    php $composer_dir/composer.phar self-update
 fi
 
 # Clean up those .git directories
@@ -35,5 +37,5 @@ if [[ "$@" == "cleanup" ]]; then
 fi
 
 if [[ "$@" != "self-update" ]]; then
-    php ./composer.phar $@
+    php $composer_dir/composer.phar $@
 fi
