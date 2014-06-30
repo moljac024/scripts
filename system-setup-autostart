@@ -24,10 +24,10 @@ fi
 [ `pgrep xfce4-power-manager` ] || xfce4-power-manager &
 
 # Command launcher
-[ `pgrep synapse` ] || synapse -s &
+#[ `pgrep synapse` ] || synapse -s &
 
 # Command launcher
-#[ `pgrep kupfer` ] || kupfer &
+[ `pgrep kupfer` ] || kupfer --no-splash &
 
 # Music daemon
 #[ `pgrep mpd` ] || mpd &
