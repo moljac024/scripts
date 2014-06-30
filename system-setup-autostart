@@ -30,7 +30,7 @@ fi
 #[ `pgrep kupfer` ] || kupfer &
 
 # Music daemon
-[ `pgrep mpd` ] || mpd &
+#[ `pgrep mpd` ] || mpd &
 
 # Network manager
 [ `pgrep nm-applet ` ] || nm-applet &
@@ -39,7 +39,7 @@ fi
 #[ `pgrep transmission` ] || transmission-gtk -m &
 
 # Music player
-[ `pgrep sonata` ] || sonata --hidden &
+#[ `pgrep sonata` ] || sonata --hidden &
 
 # Chat client
 [ `pgrep pidgin` ] || pidgin &
