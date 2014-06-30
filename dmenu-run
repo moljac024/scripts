@@ -8,7 +8,6 @@
 if [[ "$#" > 0 ]]; then
     THEME="$1"
 else
-    echo 'waaa'
     THEME="default"
 fi
 
