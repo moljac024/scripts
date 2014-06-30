@@ -3,8 +3,4 @@
 # Restore wallpaper
 #------------------------------
 
-if xrandr -q | grep "VGA1 disconnected" >/dev/null; then
-    . ~/.fehbg
-elif xrandr -q | grep "VGA1 connected" >/dev/null; then
-    nitrogen --restore
-fi
+nitrogen --restore
