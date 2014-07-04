@@ -27,7 +27,7 @@ fi
 #[ `pgrep synapse` ] || synapse -s &
 
 # Command launcher
-[ `pgrep kupfer` ] || kupfer --no-splash &
+#[ `pgrep kupfer` ] || kupfer --no-splash &
 
 # Music daemon
 #[ `pgrep mpd` ] || mpd &

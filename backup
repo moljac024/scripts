@@ -102,6 +102,6 @@ backupFonts
 if [[ "$1" != "--min" ]]; then
     backupVim
     backupEmacs
-    backupDevelopment
+    backupProjects
 fi
 exit 0
