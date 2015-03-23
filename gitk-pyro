@@ -1,6 +1,0 @@
-#!/bin/bash
-
-cd $HOME/dev/lis/pyro
-gitk --all
-
-exit 0

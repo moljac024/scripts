@@ -1,6 +1,0 @@
-#!/bin/bash
-
-cd $HOME/dev/maklerdb
-gitk --all
-
-exit 0

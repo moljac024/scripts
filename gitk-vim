@@ -1,6 +1,0 @@
-#!/bin/bash
-
-cd $HOME/.vim
-gitk --all
-
-exit 0
