@@ -1,0 +1,10 @@
+#!/bin/bash
+
+for file in in $(ls); do
+    if [[ -d "$file" && -d "$file/.git" ]]; then
+        echo "Updating $file.."
+        cd $file
+        git fetch --all --prune
+        cd ..
+    fi
+done
