@@ -1,4 +1,4 @@
 #!/bin/bash
 
-/usr/bin/env python /opt/virtualenv/virtualenv-1.11.4/virtualenv.py "$@"
+/usr/bin/env python $HOME/.virtualenv/current/virtualenv.py "$@"
 
