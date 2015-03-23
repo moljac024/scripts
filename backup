@@ -17,14 +17,21 @@ backupConfigs () {
     echo "Backing up configs.."
     cd "$HOME"
     tar -czf "$backupDir"/Configs.tar.gz \
-        .bashrc .bash.mine \
-        .tmux.conf .mpdconf \
-        .rtorrent.rc .dosbox/ \
-        .conkyrc .ssh/ .i3/ \
-        .weechat/ .wine/ .wine-bottles/ \
-        .Xresources .xmodmap .xmonad/ \
-        .config/conky/ .config/Terminal/ \
-        .config/awesome/ .config/openbox/ \
+        .bashrc  \
+        .bash.mine \
+        .tmux.conf \
+        .rtorrent.rc \
+        .dosbox/ \
+        .ssh/ \
+        .i3/ \
+        .wine/ \
+        .wine-bottles/ \
+        .Xresources \
+        .xmodmap \
+        .xmonad/ \
+        .tmuxinator/ \
+        .config/awesome/ \
+        .config/openbox/ \
         &> /dev/null
 }
 
